@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import {

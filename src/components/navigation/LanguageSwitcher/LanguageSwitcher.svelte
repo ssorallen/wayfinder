@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { languages } from '$lib/i18n';
 	import { locale, t } from 'svelte-i18n';

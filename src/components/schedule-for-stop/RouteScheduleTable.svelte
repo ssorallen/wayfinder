@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { t, isLoading } from 'svelte-i18n';
 	import { convert24HourTo12Hour } from '$lib/dateTimeFormat';

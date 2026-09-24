@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import {
 		PUBLIC_OBA_REGION_NAME,

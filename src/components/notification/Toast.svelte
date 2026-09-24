@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { notifications } from '$stores/notificationStore';
 	import { t } from 'svelte-i18n';

@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { page } from '$app/stores';
 	import { _ } from 'svelte-i18n';

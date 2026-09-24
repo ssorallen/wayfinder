@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import SingleSelectAccordion from '../SingleSelectAccordion.svelte';
 	import AccordionItem from '../AccordionItem.svelte';

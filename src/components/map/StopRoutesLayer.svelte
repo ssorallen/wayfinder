@@ -16,6 +16,7 @@
     @prop {Map<string,string>} routeStopIds - bindable out: stop id -> ring-dot color
     @prop {Map<string,number>} liveCounts - bindable out: route id -> live vehicle count
 -->
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { onDestroy, untrack } from 'svelte';
 	import {

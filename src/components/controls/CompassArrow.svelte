@@ -7,6 +7,7 @@
       If the value is not one of these, the arrow will be hidden.
 -->
 
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';

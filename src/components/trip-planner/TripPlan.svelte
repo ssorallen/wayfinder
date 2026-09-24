@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { debounce } from '$lib/utils';
 	import { onMount, onDestroy } from 'svelte';

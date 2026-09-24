@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	let { message = 'Thank you for taking the survey!' } = $props();
 </script>

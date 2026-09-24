@@ -4,6 +4,7 @@
     rendered by the (map) layout (MapExperience) based on the URL; this page only
     emits the head tags a shared link needs, which SSR from the server load.
 -->
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { PUBLIC_OBA_REGION_NAME } from '$env/static/public';
 

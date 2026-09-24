@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { browser } from '$app/environment';
 	import { onMount, onDestroy } from 'svelte';

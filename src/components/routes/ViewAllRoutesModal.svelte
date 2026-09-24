@@ -10,6 +10,7 @@
     @prop {('peek'|'half'|'full')} snap - Bindable current snap point of the sheet
 -->
 
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import BottomSheet from '$components/navigation/BottomSheet.svelte';
 	import LoadingSpinner from '$components/LoadingSpinner.svelte';

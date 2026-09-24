@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import '$lib/i18n.js';
 	import MapView from './map/MapView.svelte';

@@ -15,6 +15,7 @@
 	@prop {number|null} [routeType]
 	@prop {string} [class] - Extra classes on the button (include h-/w- to override default size)
 -->
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faStar as faStarSolid } from '@fortawesome/free-solid-svg-icons';

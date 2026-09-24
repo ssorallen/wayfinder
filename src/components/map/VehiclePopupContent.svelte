@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { formatLastUpdated } from '$lib/dateTimeFormat';
 	import '$lib/i18n';

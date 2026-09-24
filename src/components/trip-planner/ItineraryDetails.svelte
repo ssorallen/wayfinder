@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import LegDetails from './LegDetails.svelte';
 	import { msToTimeString } from '$lib/dateTimeFormat';

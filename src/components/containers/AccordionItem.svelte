@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { getContext } from 'svelte';
 	import { slide } from 'svelte/transition';

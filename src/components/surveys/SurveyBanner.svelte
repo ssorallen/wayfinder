@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	/**
 	 * Compact, collapsible survey banner for the stop pane.

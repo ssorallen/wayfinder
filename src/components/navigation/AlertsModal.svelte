@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { Modal, Button } from 'flowbite-svelte';
 	import { getLocaleFromNavigator } from 'svelte-i18n';

@@ -6,6 +6,7 @@
     @prop {Function} onclick - Called when the field is tapped
 -->
 
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
 	import { faMagnifyingGlass, faArrowRight } from '@fortawesome/free-solid-svg-icons';

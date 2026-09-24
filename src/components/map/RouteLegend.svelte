@@ -7,6 +7,7 @@
     Desktop only: at phone width the bottom sheet already owns this space, and
     the arrival badges carry the same mapping.
 -->
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import '$lib/i18n.js';
 	import { isLoading, t } from 'svelte-i18n';

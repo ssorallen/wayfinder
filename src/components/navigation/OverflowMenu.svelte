@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	let { links = [], onClose } = $props();
 	let menuRef = $state(null);

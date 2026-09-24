@@ -24,6 +24,11 @@ export default [
 		}
 	},
 	{
+		rules: {
+			'svelte/block-lang': ['error', { script: 'ts' }]
+		}
+	},
+	{
 		ignores: ['build/', '.svelte-kit/', 'dist/', 'src/lib/googleMaps.js', 'coverage']
 	}
 ];

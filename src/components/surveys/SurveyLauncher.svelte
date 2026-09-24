@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { onDestroy, tick } from 'svelte';
 	import { showSurveyModal, surveyStore } from '$stores/surveyStore';

@@ -15,6 +15,7 @@
     @prop {Map<string, any>} [routeColors] - Resolved by MapExperience; one color per route, forwarded to the arrival badges
 -->
 
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import BottomSheet from '$components/navigation/BottomSheet.svelte';
 	import StopPane from '$components/stops/StopPane.svelte';

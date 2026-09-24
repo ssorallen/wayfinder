@@ -22,7 +22,9 @@ If you have an idea for something new, open an issue first to discuss it. This s
 
 ## Code Style
 
-Prettier and ESLint are already configured — you don't need to make style decisions, just run the tools. The project uses tabs, single quotes, and a 100-character print width. For Svelte components, we use Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`) — follow the patterns you see in existing components rather than inventing new conventions.
+- Prettier and ESLint are already configured — you don't need to make style decisions, just run the tools. The project uses tabs, single quotes, and a 100-character print width. For Svelte components, we use Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`) — follow the patterns you see in existing components rather than inventing new conventions.
+- Prefer TypeScript in Svelte components with `<script lang="ts">`. This enables the strong
+  compile-time typechecking from TS inside Wayfinder's Svelte components.
 
 ## AI-Generated Code
 

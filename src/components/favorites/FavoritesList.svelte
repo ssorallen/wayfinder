@@ -6,6 +6,7 @@
 	@prop {Function} [onStopClick] - Called with the stop favorite entry
 	@prop {Function} [onRouteClick] - Called with the route favorite entry
 -->
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { t } from 'svelte-i18n';
 	import { favorites } from '$stores/favoritesStore';

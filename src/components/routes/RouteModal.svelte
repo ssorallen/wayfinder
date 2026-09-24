@@ -12,6 +12,7 @@
     @prop {('peek'|'half'|'full')} snap - Bindable current snap point of the sheet
 -->
 
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import StopItem from '$components/StopItem.svelte';
 	import BottomSheet from '$components/navigation/BottomSheet.svelte';

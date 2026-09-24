@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { Radio, Checkbox, Input } from 'flowbite-svelte';
 	import { t } from 'svelte-i18n';

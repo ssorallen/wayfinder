@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { setContext } from 'svelte';
 	import { get, writable, derived } from 'svelte/store';

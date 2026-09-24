@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { t } from 'svelte-i18n';
 	import analytics from '$lib/Insights';

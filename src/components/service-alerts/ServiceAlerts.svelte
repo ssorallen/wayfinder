@@ -1,3 +1,4 @@
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { modalOpen } from '$src/stores/modalOpen';
 	import {

@@ -6,6 +6,7 @@
 	@prop {Function} [onStopClick] - Called with a stop favorite when selected
 	@prop {Function} [onRouteClick] - Called with a route favorite when selected
 -->
+<!-- eslint-disable-next-line svelte/block-lang -->
 <script>
 	import { tick } from 'svelte';
 	import { FontAwesomeIcon } from '@fortawesome/svelte-fontawesome';
