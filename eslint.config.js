@@ -25,7 +25,7 @@ export default [
 	},
 	{
 		rules: {
-			'svelte/block-lang': ['error', { script: 'ts' }]
+			'svelte/block-lang': ['error', { script: 'ts', style: ['postcss', null] }]
 		}
 	},
 	{
