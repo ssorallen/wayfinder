@@ -40,16 +40,10 @@
 	</p>
 	{#snippet footer()}
 		<div class="flex-1 text-right">
-			<Button
-				class="bg-gray-300 text-black hover:bg-gray-400 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-				on:click={() => (showModal = false)}
-			>
+			<Button on:click={() => (showModal = false)} variant="secondary">
 				{$t('alert.close')}
 			</Button>
-			<Button
-				class="bg-brand-accent hover:bg-brand-accent-dark dark:bg-brand-accent dark:hover:bg-brand-accent-dark text-white dark:text-white"
-				on:click={() => window.open(getUrlTranslation(), '_blank')}
-			>
+			<Button on:click={() => window.open(getUrlTranslation(), '_blank')}>
 				{$t('alert.more_info')}
 			</Button>
 		</div>

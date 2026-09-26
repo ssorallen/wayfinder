@@ -1,7 +1,20 @@
-export function debounce(func, wait) {
-	let timeout;
+import type { ArrivalAndDepartureListResponse } from 'onebusaway-sdk/resources/arrival-and-departure';
+import type { StopsForLocationListResponse } from 'onebusaway-sdk/resources/stops-for-location';
 
-	return function (...args) {
+export { cn } from 'cn';
+
+export type WithoutChild<T> = T extends { child?: unknown } ? Omit<T, 'child'> : T;
+export type WithoutChildren<T> = T extends { children?: unknown } ? Omit<T, 'children'> : T;
+export type WithoutChildrenOrChild<T> = WithoutChildren<WithoutChild<T>>;
+export type WithElementRef<T, U extends HTMLElement = HTMLElement> = T & { ref?: U | null };
+
+export function debounce<Args extends unknown[], This>(
+	func: (this: This, ...args: Args) => unknown,
+	wait: number
+): (this: This, ...args: Args) => void {
+	let timeout: ReturnType<typeof setTimeout>;
+
+	return function (this: This, ...args: Args) {
 		clearTimeout(timeout);
 		timeout = setTimeout(() => func.apply(this, args), wait);
 	};
@@ -19,7 +32,7 @@ export function debounce(func, wait) {
  * removeAgencyPrefix("1_41242")   // returns "41242"
  * removeAgencyPrefix("41242")     // returns "41242" (no prefix to remove)
  */
-export function removeAgencyPrefix(idString) {
+export function removeAgencyPrefix(idString: string): string {
 	if (!idString || typeof idString !== 'string') {
 		return idString;
 	}
@@ -37,13 +50,16 @@ export function removeAgencyPrefix(idString) {
  * Extracts the sorted route short names served by a stop from an
  * arrivals-and-departures API response.
  *
- * @param {Object} arrivalsAndDeparturesResponse - Response from the arrivals-and-departures-for-stop API
- * @param {Object} stop - Stop object with a routeIds array
- * @returns {Array<string>|null} Lexicographically sorted route short names (falling back to the
+ * @param arrivalsAndDeparturesResponse - Response from the arrivals-and-departures-for-stop API
+ * @param stop - Stop object with a routeIds array
+ * @returns Lexicographically sorted route short names (falling back to the
  *   route id without its agency prefix), or null when the response has no route references
  *   or the stop has no routeIds array
  */
-export function routeShortNamesForStop(arrivalsAndDeparturesResponse, stop) {
+export function routeShortNamesForStop(
+	arrivalsAndDeparturesResponse: ArrivalAndDepartureListResponse | null | undefined,
+	stop: Pick<StopsForLocationListResponse.Data.List, 'routeIds'> | null | undefined
+): string[] | null {
 	const routes = arrivalsAndDeparturesResponse?.data?.references?.routes;
 	if (!routes || !Array.isArray(stop?.routeIds)) {
 		return null;
