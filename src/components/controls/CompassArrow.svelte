@@ -1,26 +1,24 @@
 <!--
     This Svelte component renders an arrow icon that rotates based on the provided `stopDirection` prop.
-
-    Props:
-    - `stopDirection` (string): The direction in which the arrow should point.
-      Possible values are 'N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'.
-      If the value is not one of these, the arrow will be hidden.
 -->
 
-<script>
+<script lang="ts">
 	import { ArrowRight } from '@lucide/svelte';
 
-	/**
-	 * @typedef {Object} Props
-	 * @property {string} [stopDirection]
-	 */
+	interface Props {
+		/**
+		 * The direction in which the arrow should point.
+		 * Possible values are 'N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'.
+		 * If the value is not one of these, the arrow will be hidden.
+		 */
+		stopDirection?: string;
+	}
 
-	/** @type {Props} */
-	let { stopDirection = '' } = $props();
+	let { stopDirection = '' }: Props = $props();
 
 	// Rotation classes keyed by compass direction. `rotate-135` and `rotate-225`
 	// are registered via `theme.extend.rotate` in tailwind.config.js.
-	const ROTATION_CLASS_BY_DIRECTION = {
+	const ROTATION_CLASS_BY_DIRECTION: Record<string, string> = {
 		N: '-rotate-90',
 		NE: '-rotate-45',
 		E: 'rotate-0',

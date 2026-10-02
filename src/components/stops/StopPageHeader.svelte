@@ -1,21 +1,31 @@
-<script>
+<script lang="ts">
 	import { ArrowLeft, Map, MapPin } from '@lucide/svelte';
 	import CompassArrow from '$components/controls/CompassArrow.svelte';
 	import FavoriteToggle from '$components/favorites/FavoriteToggle.svelte';
+	import Skeleton from '$components/Skeleton.svelte';
 	import TabContainer from '$components/tabs/TabContainer.svelte';
 	import TabLink from '$components/tabs/TabLink.svelte';
 	import { page } from '$app/stores';
-
 	import { t, isLoading } from 'svelte-i18n';
 	import { removeAgencyPrefix, directionLabel } from '$lib/utils';
+
+	interface Props {
+		stopCode?: string | null;
+		stopDirection?: string;
+		stopId: string;
+		stopLat?: number | null;
+		stopLon?: number | null;
+		stopName?: string;
+	}
+
 	let {
-		stopName,
-		stopId,
+		stopCode = null,
 		stopDirection,
+		stopId,
 		stopLat = null,
 		stopLon = null,
-		stopCode = null
-	} = $props();
+		stopName
+	}: Props = $props();
 </script>
 
 <div class="my-4">
@@ -32,32 +42,39 @@
 
 	<div class="text-center">
 		<div class="flex items-center justify-center gap-2">
-			<h1 class="text-3xl font-bold text-brand-accent">
-				{stopName}
-			</h1>
-			{#if stopLat != null && stopLon != null}
-				<FavoriteToggle
-					type="stop"
-					id={stopId}
-					name={stopName}
-					code={stopCode}
-					direction={stopDirection}
-					lat={stopLat}
-					lon={stopLon}
-					class="h-9 w-9"
-				/>
+			{#if stopName}
+				<h1 class="text-3xl font-bold text-brand-accent">
+					{stopName}
+				</h1>
+			{:else}
+				<Skeleton class="h-9 w-64" />
 			{/if}
+			<FavoriteToggle
+				disabled={stopLat == null || stopLon == null}
+				type="stop"
+				id={stopId}
+				name={stopName}
+				code={stopCode}
+				direction={stopDirection}
+				lat={stopLat}
+				lon={stopLon}
+				class="h-9 w-9"
+			/>
 		</div>
-		<div class="text-normal mt-2 flex items-center justify-center gap-x-8 text-gray-700">
-			<div class="rounded-md bg-gray-50 px-2 py-1">
+		<div class="text-normal mt-2 flex items-center justify-center gap-x-4 text-gray-700">
+			<div class="flex items-center gap-x-1 rounded-full bg-gray-100 px-2.5 py-1">
 				<MapPin class="inline h-4 w-4" />
 				<strong>{$isLoading ? '' : $t('schedule_for_stop.stop_id')}:</strong>
 				{removeAgencyPrefix(stopId)}
 			</div>
-			<div class="rounded-md bg-gray-50 px-2 py-1">
+			<div class="flex items-center gap-x-1 rounded-full bg-gray-100 px-2.5 py-1">
 				<CompassArrow {stopDirection} />
 				<strong>{$isLoading ? '' : $t('schedule_for_stop.direction')}:</strong>
-				{directionLabel(stopDirection, $t) ?? ''}
+				{#if stopDirection}
+					{directionLabel(stopDirection, $t) ?? ''}
+				{:else}
+					<Skeleton class="w-8 self-stretch !bg-gray-300" />
+				{/if}
 			</div>
 		</div>
 		<TabContainer>

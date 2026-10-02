@@ -7,9 +7,9 @@
 	import Accordion from '$components/containers/Accordion.svelte';
 	import AccordionItem from '$components/containers/AccordionItem.svelte';
 	import { Datepicker } from 'flowbite-svelte';
-	import { onMount } from 'svelte';
 	import { t, isLoading } from 'svelte-i18n';
 	import { getFirstDayOfWeek } from '$config/calendarConfig.js';
+	import Skeleton from '$components/Skeleton.svelte';
 
 	let selectedDate = $state(new Date());
 	let prevSelectedDate = $state(null);
@@ -26,7 +26,6 @@
 
 	let schedulesMap = new Map();
 	let routeReference = new Map();
-	let currentDate = new Date();
 
 	stopId = $page.params.stopID;
 
@@ -108,13 +107,6 @@
 		allRoutesExpanded = !allRoutesExpanded;
 	}
 
-	onMount(async () => {
-		if (stopId) {
-			const formattedDate = currentDate.toISOString().split('T')[0];
-			await fetchScheduleForStop(stopId, formattedDate);
-		}
-	});
-
 	$effect(() => {
 		if (selectedDate && selectedDate !== prevSelectedDate) {
 			const formattedDate = selectedDate.toISOString().split('T')[0];
@@ -181,14 +173,19 @@
 					</p>
 				{:else}
 					<Accordion bind:this={accordionComponent}>
-						{#each schedules as schedule}
-							<AccordionItem>
-								{#snippet header()}
-									<span>{schedule.tripHeadsign}</span>
-								{/snippet}
-								<RouteScheduleTable {schedule} />
-							</AccordionItem>
-						{/each}
+						{#if schedules.length === 0}
+							<Skeleton class="h-12 rounded-none" />
+						{/if}
+						{#if schedules.length > 0}
+							{#each schedules as schedule}
+								<AccordionItem>
+									{#snippet header()}
+										<span>{schedule.tripHeadsign}</span>
+									{/snippet}
+									<RouteScheduleTable {schedule} />
+								</AccordionItem>
+							{/each}
+						{/if}
 					</Accordion>
 				{/if}
 			</div>
