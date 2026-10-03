@@ -276,4 +276,48 @@ describe('/stops/[stopID]/schedule', () => {
 		expect(screen.queryByText('8 - University District')).not.toBeInTheDocument();
 		expect(console.error).not.toHaveBeenCalled();
 	});
+
+	test("drops a date still loading for the previous stop when another stop's data arrives", async () => {
+		const user = userEvent.setup();
+		// Ignores the signal, like a response that was already read when the
+		// request was aborted.
+		let resolveOtherDate;
+		fetchMock.mockImplementationOnce(() => new Promise((resolve) => (resolveOtherDate = resolve)));
+		const otherStop = { ...stop, id: '1_75404', name: 'Pike St & 4th Ave' };
+
+		const { rerender } = renderPage([routeSchedule('Capitol Hill')]);
+		await selectDate(user, otherDate);
+		await rerender({
+			data: {
+				scheduleForStop: {
+					entry: { stopId: otherStop.id, stopRouteSchedules: [routeSchedule('Ballard')] },
+					references: { routes: [route], stops: [otherStop] }
+				},
+				serviceDay: dateToServiceDay(new Date())
+			}
+		});
+
+		expect(fetchMock.mock.calls[0][1].signal.aborted).toBe(true);
+		expect(screen.getByTestId('route-schedules').inert).toBe(false);
+
+		resolveOtherDate(scheduleResponse([routeSchedule('University District')]));
+		await tick();
+
+		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(otherStop.name);
+		expect(screen.getByText('8 - Ballard')).toBeInTheDocument();
+		expect(screen.queryByText('8 - University District')).not.toBeInTheDocument();
+	});
+
+	test('cancels a date still loading when the page closes', async () => {
+		const user = userEvent.setup();
+		pendingFetch();
+
+		const { unmount } = renderPage([routeSchedule('Capitol Hill')]);
+		await selectDate(user, otherDate);
+		unmount();
+		await tick();
+
+		expect(fetchMock.mock.calls[0][1].signal.aborted).toBe(true);
+		expect(console.error).not.toHaveBeenCalled();
+	});
 });

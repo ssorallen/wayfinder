@@ -31,6 +31,16 @@
 	// date can't overwrite the current one.
 	let scheduleRequest: AbortController | null = null;
 
+	// New `data` (another stop) resets the date and schedule above, so a date
+	// still loading for the old data is stale. Leaving the page cancels it too.
+	$effect(() => {
+		void data;
+		return () => {
+			scheduleRequest?.abort();
+			loading = false;
+		};
+	});
+
 	// The stop doesn't vary by date, so it comes from the server's response,
 	// which a failed request for another date can't clear.
 	const stopId = $derived(data.scheduleForStop.entry.stopId);
@@ -53,11 +63,12 @@
 		scheduleRequest = request;
 		loading = true;
 		try {
-			scheduleForStop = await fetchScheduleForStop(fetch, stopId, serviceDay, {
+			const result = await fetchScheduleForStop(fetch, stopId, serviceDay, {
 				signal: request.signal
 			});
+			if (!request.signal.aborted) scheduleForStop = result;
 		} catch (error) {
-			// Superseded by a newer request, which now owns the loading state.
+			// Superseded by a newer request or new data, which now own the loading state.
 			if (request.signal.aborted) return;
 			console.error('Error fetching schedules:', error);
 			// Don't leave the previous date's schedules looking current.
