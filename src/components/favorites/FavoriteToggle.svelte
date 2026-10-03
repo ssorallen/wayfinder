@@ -2,60 +2,38 @@
 	@component
 	Star button that toggles a stop or route in the favorites store.
 	Membership is derived from `$favorites` — no local isFavorite state.
+
+	@prop {'stop'|'route'} type
+	@prop {string} id - Full agency-prefixed OBA id
+	@prop {string} [name] - Stop name (required for type=stop)
+	@prop {string|null} [code]
+	@prop {string|null} [direction]
+	@prop {number} [lat] - Required for type=stop
+	@prop {number} [lon] - Required for type=stop
+	@prop {string} [shortName] - Required for type=route
+	@prop {string|null} [description]
+	@prop {number|null} [routeType]
+	@prop {string} [class] - Extra classes on the button (include h-/w- to override default size)
 -->
-<script lang="ts">
+<script>
 	import { Star } from '@lucide/svelte';
 	import { t } from 'svelte-i18n';
 	import { favorites } from '$stores/favoritesStore';
 	import { notifyFavoriteSaved, notifyFavoriteRemoved } from '$lib/favoriteNotifications';
 
-	interface Props {
-		/**
-		 * Extra classes on the button (include h-/w- to override default size)
-		 */
-		class?: string;
-		code?: string | null;
-		description?: string | null;
-		direction?: string | null;
-		disabled?: boolean;
-		/**
-		 * Full agency-prefixed OBA id
-		 */
-		id: string;
-		/**
-		 * Required for type=stop
-		 */
-		lat?: number | null;
-		/**
-		 * Required for type=stop
-		 */
-		lon?: number | null;
-		/**
-		 * Stop name (required for type=stop)
-		 */
-		name?: string | null;
-		routeType?: number | null;
-		/**
-		 * Required for type=route
-		 */
-		shortName?: string | null;
-		type: 'stop' | 'route';
-	}
-
 	let {
-		class: className = '',
-		code = null,
-		description = null,
-		direction = null,
-		disabled = false,
+		type,
 		id,
+		name = null,
+		code = null,
+		direction = null,
 		lat = null,
 		lon = null,
-		name = null,
-		routeType = null,
 		shortName = null,
-		type
-	}: Props = $props();
+		description = null,
+		routeType = null,
+		class: className = ''
+	} = $props();
 
 	// Read membership from the writable array (not a Set derived store) so the
 	// auto-subscription always invalidates when favorites.toggle() writes.
@@ -94,13 +72,10 @@
 	aria-pressed={isFav}
 	aria-label={label}
 	title={label}
-	{disabled}
-	class="group flex {sizeClass} flex-none items-center justify-center rounded-xl border border-gray-300 text-black enabled:hover:bg-gray-100 disabled:border-gray-200 disabled:text-gray-300 dark:border-gray-600 dark:text-white dark:enabled:hover:bg-gray-700 dark:disabled:border-gray-700 dark:disabled:text-gray-600 {className}"
+	class="flex {sizeClass} flex-none items-center justify-center rounded-xl border border-gray-300 text-black hover:bg-gray-100 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700 {className}"
 >
 	<Star
-		class="h-4 w-4 {isFav
-			? 'text-black group-disabled:text-gray-400 dark:text-white dark:group-disabled:text-gray-500'
-			: ''}"
+		class="h-4 w-4 {isFav ? 'text-black dark:text-white' : ''}"
 		fill={isFav ? 'currentColor' : 'none'}
 	/>
 </button>

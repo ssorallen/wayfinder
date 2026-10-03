@@ -149,7 +149,7 @@ describe('/stops/[stopID]/schedule', () => {
 
 		expect(screen.getByText('schedule_for_stop.no_schedules_available')).toBeInTheDocument();
 		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(stop.name);
-		expect(screen.getByRole('button', { name: 'favorites.add' })).toBeEnabled();
+		expect(screen.getByRole('button', { name: 'favorites.add' })).toBeInTheDocument();
 		expect(container.querySelector('.animate-pulse')).not.toBeInTheDocument();
 	});
 

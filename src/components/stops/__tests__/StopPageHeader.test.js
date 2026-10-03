@@ -72,7 +72,7 @@ describe('StopPageHeader', () => {
 		stopCode: '75403'
 	};
 
-	test('renders a favorite toggle next to the stop name when coords are present', () => {
+	test('renders a favorite toggle next to the stop name', () => {
 		render(StopPageHeader, { props: defaultProps });
 
 		expect(screen.getByRole('button', { name: 'Add to favorites' })).toBeInTheDocument();
@@ -86,18 +86,6 @@ describe('StopPageHeader', () => {
 
 		expect(heading).toHaveAccessibleName('Pine St & 3rd Ave');
 		expect(heading.contains(toggle)).toBe(false);
-	});
-
-	test('disables the favorite toggle when stop coordinates are missing', () => {
-		render(StopPageHeader, {
-			props: {
-				stopName: 'Pine St & 3rd Ave',
-				stopId: '1_75403',
-				stopDirection: 'N'
-			}
-		});
-
-		expect(screen.getByRole('button', { name: 'Add to favorites' })).toBeDisabled();
 	});
 
 	test('displays stop name as main heading', () => {

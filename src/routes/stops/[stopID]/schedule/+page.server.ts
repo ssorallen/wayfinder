@@ -21,10 +21,16 @@ export async function load({ params }) {
 	).json();
 	const { stopId } = scheduleForStop.entry;
 
+	// OBA includes the stop in the references; the page can't render without it.
+	const stop = scheduleForStop.references.stops.find((stop) => stop.id === stopId);
+	if (!stop) {
+		error(500, 'Unable to fetch stop.');
+	}
+
 	return {
 		schedules: getRouteSchedules(scheduleForStop, env.PUBLIC_OBA_TIMEZONE || undefined),
 		serviceDay,
-		stop: scheduleForStop.references.stops.find((stop) => stop.id === stopId),
+		stop,
 		stopId
 	};
 }

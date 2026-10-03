@@ -90,28 +90,26 @@
 </script>
 
 <svelte:head>
-	<title>{stop?.name}{$isLoading ? '' : ` - ${$t('schedule_for_stop.route_schedules')}`}</title>
-	{#if stop}
-		<link
-			rel="manifest"
-			href="/api/manifest?start=/stops/{encodeURIComponent(
-				stopId
-			)}/schedule&name={encodeURIComponent(stop.name)}"
-		/>
-		<meta name="apple-mobile-web-app-capable" content="yes" />
-		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
-		<meta name="apple-mobile-web-app-title" content={stop.name} />
-	{/if}
+	<title>{stop.name}{$isLoading ? '' : ` - ${$t('schedule_for_stop.route_schedules')}`}</title>
+	<link
+		rel="manifest"
+		href="/api/manifest?start=/stops/{encodeURIComponent(stopId)}/schedule&name={encodeURIComponent(
+			stop.name
+		)}"
+	/>
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+	<meta name="apple-mobile-web-app-title" content={stop.name} />
 </svelte:head>
 
 <StandalonePage>
 	<StopPageHeader
-		stopName={stop?.name}
+		stopName={stop.name}
 		{stopId}
-		stopDirection={stop?.direction}
-		stopLat={stop?.lat}
-		stopLon={stop?.lon}
-		stopCode={stop?.code}
+		stopDirection={stop.direction}
+		stopLat={stop.lat}
+		stopLon={stop.lon}
+		stopCode={stop.code}
 	/>
 
 	<div class="flex flex-col">

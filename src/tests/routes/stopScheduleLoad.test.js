@@ -75,6 +75,14 @@ describe('/stops/[stopID]/schedule load', () => {
 		await expect(load({ params: { stopID: stop.id } })).rejects.toMatchObject({ status: 500 });
 	});
 
+	test("fails when OBA's references leave out the stop", async () => {
+		const response = scheduleResponse();
+		response.data.references.stops = [];
+		getScheduleForStop.mockResolvedValue(response);
+
+		await expect(load({ params: { stopID: stop.id } })).rejects.toMatchObject({ status: 500 });
+	});
+
 	test.each([
 		['an empty response', null],
 		['code 404', { code: 404 }]

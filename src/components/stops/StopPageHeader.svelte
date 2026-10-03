@@ -12,19 +12,12 @@
 		stopCode?: string | null;
 		stopDirection?: string;
 		stopId: string;
-		stopLat?: number | null;
-		stopLon?: number | null;
-		stopName?: string;
+		stopLat: number;
+		stopLon: number;
+		stopName: string;
 	}
 
-	let {
-		stopCode = null,
-		stopDirection,
-		stopId,
-		stopLat = null,
-		stopLon = null,
-		stopName
-	}: Props = $props();
+	let { stopCode = null, stopDirection, stopId, stopLat, stopLon, stopName }: Props = $props();
 </script>
 
 <div class="my-4">
@@ -45,7 +38,6 @@
 				{stopName}
 			</h1>
 			<FavoriteToggle
-				disabled={stopLat == null || stopLon == null}
 				type="stop"
 				id={stopId}
 				name={stopName}
