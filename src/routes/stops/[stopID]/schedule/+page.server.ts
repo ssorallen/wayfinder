@@ -4,7 +4,7 @@ import { env } from '$env/dynamic/public';
 import { getTodayDateForInput } from '$lib/dateTimeInput';
 import { handleOBAResponse } from '$lib/obaSdk';
 import { getRouteSchedules } from '$lib/scheduleForStop';
-import { getScheduleForStop } from '$lib/server/scheduleForStop';
+import { getScheduleForStop } from '$lib/server/obaScheduleForStop';
 
 export async function load({ params }) {
 	// Always today in the region's timezone. Other dates are only picked in the

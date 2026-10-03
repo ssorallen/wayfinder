@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import { localTimeFormat, msToPlainTime, plainTimeToDate } from '$lib/dateTimeFormat.js';
 import { removeAgencyPrefix } from '$lib/utils';
 
-type ScheduleStopTime =
+export type ScheduleStopTime =
 	ScheduleForStopRetrieveResponse.Data.Entry.StopRouteSchedule.StopRouteDirectionSchedule.ScheduleStopTime & {
 		/**
 		 * The trip's own headsign, added by the schedule-for-stop API route
@@ -28,7 +28,7 @@ export interface RouteSchedule {
 /**
  * Fetches a stop's schedule for one service day through the app's API route,
  * which the schedule page uses in the browser for dates other than today. The
- * route and the page's server load share `$lib/server/scheduleForStop`, so both
+ * route and the page's server load share `$lib/server/obaScheduleForStop`, so both
  * get the same agency filtering and trip headsigns.
  *
  * @param fetch

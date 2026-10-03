@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 const getScheduleForStop = vi.hoisted(() => vi.fn());
-vi.mock('$lib/server/scheduleForStop', () => ({ getScheduleForStop }));
+vi.mock('$lib/server/obaScheduleForStop', () => ({ getScheduleForStop }));
 
 vi.mock('$env/dynamic/public', () => ({
 	env: { PUBLIC_OBA_TIMEZONE: 'America/Los_Angeles' }

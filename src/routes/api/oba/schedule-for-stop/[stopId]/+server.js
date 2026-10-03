@@ -1,7 +1,7 @@
 import { env } from '$env/dynamic/public';
 import { getTodayDateForInput } from '$lib/dateTimeInput';
 import { handleOBAResponse } from '$lib/obaSdk';
-import { getScheduleForStop } from '$lib/server/scheduleForStop.js';
+import { getScheduleForStop } from '$lib/server/obaScheduleForStop';
 
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url, params }) {

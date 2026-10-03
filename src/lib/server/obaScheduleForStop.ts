@@ -1,20 +1,26 @@
+import type { ScheduleForStopRetrieveResponse } from 'onebusaway-sdk/resources/schedule-for-stop';
 import oba from '$lib/obaSdk';
-import { getTripHeadsigns } from '$lib/server/tripHeadsigns.js';
-import { getAgencyFilter, filterByRouteId } from '$lib/agencyFilter.js';
+import type { ScheduleStopTime } from '$lib/scheduleForStop';
+import { getTripHeadsigns } from '$lib/server/tripHeadsigns';
+import { getAgencyFilter, filterByRouteId } from '$lib/agencyFilter';
+
+type StopRouteSchedule = ScheduleForStopRetrieveResponse.Data.Entry.StopRouteSchedule;
 
 /**
  * A stop's schedule for one service day, limited to the configured agencies,
  * with each stop time's own trip headsign added. The schedule-for-stop API
  * route and the schedule page's server load both use this.
  *
- * @param {string} stopId - Full agency-prefixed OBA id
- * @param {string} date - YYYY-MM-DD service day. The caller resolves an undated
+ * @param stopId - Full agency-prefixed OBA id
+ * @param date - YYYY-MM-DD service day. The caller resolves an undated
  *   request in the region's timezone; an undated stop response's entry.date is
  *   wall-clock time, not a service-day key.
- * @returns {Promise<import('onebusaway-sdk/resources/schedule-for-stop').ScheduleForStopRetrieveResponse | null>}
- *   Null for a stop that doesn't exist: OBA answers with an empty response.
+ * @returns `null` for a stop that doesn't exist: OBA answers with an empty response.
  */
-export async function getScheduleForStop(stopId, date) {
+export async function getScheduleForStop(
+	stopId: string,
+	date: string
+): Promise<ScheduleForStopRetrieveResponse | null> {
 	const response = await oba.scheduleForStop.retrieve(stopId, { date });
 
 	if (response?.data?.entry?.stopRouteSchedules) {
@@ -29,12 +35,12 @@ export async function getScheduleForStop(stopId, date) {
 	return response;
 }
 
-async function addTripHeadsigns(routeSchedules, date) {
+async function addTripHeadsigns(routeSchedules: StopRouteSchedule[], date: string): Promise<void> {
 	await Promise.all(
 		routeSchedules.map(async (routeSchedule) => {
 			const directions = routeSchedule?.stopRouteDirectionSchedules;
 			if (!routeSchedule?.routeId || !Array.isArray(directions)) return;
-			const stopTimesByDirection = directions.map((direction) =>
+			const stopTimesByDirection: ScheduleStopTime[][] = directions.map((direction) =>
 				Array.isArray(direction?.scheduleStopTimes)
 					? direction.scheduleStopTimes.filter((stopTime) => stopTime?.tripId)
 					: []
