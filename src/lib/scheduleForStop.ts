@@ -31,10 +31,10 @@ export interface RouteSchedule {
  * the browser for other dates, so both get the same agency filtering and trip
  * headsigns.
  *
- * @param {typeof globalThis.fetch} fetch
- * @param {string} stopId Full agency-prefixed OBA id
- * @param {string} serviceDay YYYY-MM-DD
- * @param {{ signal?: AbortSignal }} [options]
+ * @param fetch
+ * @param stopId Full agency-prefixed OBA id
+ * @param serviceDay YYYY-MM-DD
+ * @param [options]
  */
 export async function fetchScheduleForStop(
 	fetch: typeof globalThis.fetch,
@@ -58,7 +58,7 @@ export async function fetchScheduleForStop(
  * Converting through local date parts (not `toISOString()`, which is UTC)
  * keeps the calendar day the user picked.
  *
- * @param {string} serviceDay YYYY-MM-DD
+ * @param serviceDay YYYY-MM-DD
  * @returns {Date}
  */
 export function serviceDayToDate(serviceDay: string): Date {
@@ -67,8 +67,8 @@ export function serviceDayToDate(serviceDay: string): Date {
 }
 
 /**
- * @param {Date} date
- * @returns {string} YYYY-MM-DD
+ * @param date
+ * @returns YYYY-MM-DD
  */
 export function dateToServiceDay(date: Date): string {
 	return new Temporal.PlainDate(date.getFullYear(), date.getMonth() + 1, date.getDate()).toString();
