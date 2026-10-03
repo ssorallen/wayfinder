@@ -123,8 +123,8 @@ describe('GET /api/oba/schedule-for-stop/[stopId]', () => {
 		const response = await request();
 		const direction = response.data.entry.stopRouteSchedules[0].stopRouteDirectionSchedules[0];
 		expect(groupStopTimesByHour(direction.scheduleStopTimes, direction.tripHeadsign)[8]).toEqual([
-			{ arrivalTime: '8:05 AM', destination: 'Kearny Mesa', isShortLine: false },
-			{ arrivalTime: '8:25 AM', destination: 'Fashion Valley', isShortLine: true }
+			{ destination: 'Kearny Mesa', isShortLine: false, minute: 5 },
+			{ destination: 'Fashion Valley', isShortLine: true, minute: 25 }
 		]);
 		expect(mockRetrieve).toHaveBeenCalledWith('MTS_12434', { date: '2026-08-24' });
 		expect(mockFilterByRouteId).toHaveBeenCalledWith(expect.any(Array), null);

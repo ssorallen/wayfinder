@@ -1,6 +1,6 @@
 import type { ScheduleForStopRetrieveResponse } from 'onebusaway-sdk/resources/schedule-for-stop';
 import { error } from '@sveltejs/kit';
-import { localTimeFormat, msToPlainTime, plainTimeToDate } from '$lib/dateTimeFormat.js';
+import { msToPlainTime } from '$lib/dateTimeFormat.js';
 import { removeAgencyPrefix } from '$lib/utils';
 
 export type ScheduleStopTime =
@@ -12,9 +12,14 @@ export type ScheduleStopTime =
 	};
 
 interface ScheduleTableStopTime {
-	arrivalTime: string;
 	destination: string;
 	isShortLine: boolean;
+	/**
+	 * Minute of the arrival within its hour group. A number rather than a
+	 * formatted time so the server and the browser produce the same data
+	 * regardless of their locales.
+	 */
+	minute: number;
 }
 
 export interface RouteSchedule {
@@ -126,9 +131,9 @@ export function groupStopTimesByHour(
 
 		const destination = stopTime.tripHeadsign?.trim() || directionHeadsign;
 		grouped[time.hour].push({
-			arrivalTime: localTimeFormat.format(plainTimeToDate(time)),
 			destination,
-			isShortLine: destination !== directionHeadsign
+			isShortLine: destination !== directionHeadsign,
+			minute: time.minute
 		});
 	}
 

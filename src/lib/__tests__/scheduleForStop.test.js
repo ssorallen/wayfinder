@@ -75,8 +75,8 @@ describe('groupStopTimesByHour', () => {
 		);
 
 		expect(grouped[8]).toEqual([
-			{ arrivalTime: '8:05 AM', destination: 'Kearny Mesa', isShortLine: false },
-			{ arrivalTime: '8:25 AM', destination: 'Fashion Valley', isShortLine: true }
+			{ destination: 'Kearny Mesa', isShortLine: false, minute: 5 },
+			{ destination: 'Fashion Valley', isShortLine: true, minute: 25 }
 		]);
 	});
 
@@ -103,7 +103,7 @@ describe('groupStopTimesByHour', () => {
 		);
 
 		expect(grouped).toEqual({
-			8: [{ arrivalTime: '8:05 AM', destination: 'Kearny Mesa', isShortLine: false }]
+			8: [{ destination: 'Kearny Mesa', isShortLine: false, minute: 5 }]
 		});
 	});
 });

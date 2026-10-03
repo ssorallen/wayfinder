@@ -62,7 +62,7 @@ describe('/stops/[stopID]/schedule load', () => {
 		expect(schedules).toEqual([
 			{
 				stopTimes: {
-					8: [{ arrivalTime: '8:05 AM', destination: 'Capitol Hill', isShortLine: false }]
+					8: [{ destination: 'Capitol Hill', isShortLine: false, minute: 5 }]
 				},
 				tripHeadsign: '8 - Capitol Hill'
 			}

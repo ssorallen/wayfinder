@@ -41,8 +41,8 @@ vi.mock('svelte-i18n', () => ({
 const schedule = {
 	tripHeadsign: '44 - University District',
 	stopTimes: {
-		8: [{ arrivalTime: '8:05AM' }, { arrivalTime: '8:25AM' }],
-		15: [{ arrivalTime: '3:10PM' }]
+		8: [{ minute: 5 }, { minute: 25 }],
+		15: [{ minute: 10 }]
 	}
 };
 
@@ -172,11 +172,11 @@ describe('RouteScheduleTable content', () => {
 					tripHeadsign: '120 - Kearny Mesa',
 					stopTimes: {
 						8: [
-							{ arrivalTime: '8:05AM' },
+							{ minute: 5 },
 							{
-								arrivalTime: '8:25AM',
+								destination: 'Fashion Valley',
 								isShortLine: true,
-								destination: 'Fashion Valley'
+								minute: 25
 							}
 						]
 					}
