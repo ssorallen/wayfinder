@@ -29,14 +29,14 @@
 
 	// Aborted when a newer date is requested so a slow response for an older
 	// date can't overwrite the current one.
-	let scheduleRequest: AbortController | null = null;
+	let scheduleRequestController: AbortController | null = null;
 
 	// New `data` (another stop) resets the date and schedule above, so a date
 	// still loading for the old data is stale. Leaving the page cancels it too.
 	$effect(() => {
 		void data;
 		return () => {
-			scheduleRequest?.abort();
+			scheduleRequestController?.abort();
 			loading = false;
 		};
 	});
@@ -58,23 +58,22 @@
 	}
 
 	async function loadSchedule(serviceDay: string) {
-		scheduleRequest?.abort();
-		const request = new AbortController();
-		scheduleRequest = request;
+		scheduleRequestController?.abort();
+		const requestController = new AbortController();
+		scheduleRequestController = requestController;
 		loading = true;
 		try {
 			const result = await fetchScheduleForStop(fetch, stopId, serviceDay, {
-				signal: request.signal
+				signal: requestController.signal
 			});
-			if (!request.signal.aborted) scheduleForStop = result;
+			if (!requestController.signal.aborted) scheduleForStop = result;
 		} catch (error) {
-			// Superseded by a newer request or new data, which now own the loading state.
-			if (request.signal.aborted) return;
+			if (requestController.signal.aborted) return;
 			console.error('Error fetching schedules:', error);
 			// Don't leave the previous date's schedules looking current.
 			scheduleForStop = null;
 		} finally {
-			if (scheduleRequest === request) {
+			if (scheduleRequestController === requestController) {
 				loading = false;
 			}
 		}
@@ -105,7 +104,8 @@
 
 	function toggleAllRoutes() {
 		if (!accordionComponent) return;
-		else if (allRoutesExpanded) accordionComponent.closeAll();
+
+		if (allRoutesExpanded) accordionComponent.closeAll();
 		else accordionComponent.openAll();
 		allRoutesExpanded = !allRoutesExpanded;
 	}

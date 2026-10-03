@@ -16,8 +16,8 @@
 		class?: string;
 		code?: string | null;
 		description?: string | null;
-		disabled?: boolean;
 		direction?: string | null;
+		disabled?: boolean;
 		/**
 		 * Full agency-prefixed OBA id
 		 */
