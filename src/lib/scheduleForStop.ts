@@ -26,10 +26,10 @@ export interface RouteSchedule {
 }
 
 /**
- * Fetches a stop's schedule for one service day through the app's API route.
- * The schedule page's server load uses this for today and the page uses it in
- * the browser for other dates, so both get the same agency filtering and trip
- * headsigns.
+ * Fetches a stop's schedule for one service day through the app's API route,
+ * which the schedule page uses in the browser for dates other than today. The
+ * route and the page's server load share `$lib/server/scheduleForStop`, so both
+ * get the same agency filtering and trip headsigns.
  *
  * @param fetch
  * @param stopId Full agency-prefixed OBA id
@@ -59,7 +59,6 @@ export async function fetchScheduleForStop(
  * keeps the calendar day the user picked.
  *
  * @param serviceDay YYYY-MM-DD
- * @returns {Date}
  */
 export function serviceDayToDate(serviceDay: string): Date {
 	const { day, month, year } = Temporal.PlainDate.from(serviceDay);

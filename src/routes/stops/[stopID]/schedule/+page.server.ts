@@ -1,15 +1,21 @@
+import type { ScheduleForStopRetrieveResponse } from 'onebusaway-sdk/resources/schedule-for-stop';
 import { env } from '$env/dynamic/public';
 import { getTodayDateForInput } from '$lib/dateTimeInput';
-import { fetchScheduleForStop, getRouteSchedules } from '$lib/scheduleForStop';
+import { handleOBAResponse } from '$lib/obaSdk';
+import { getRouteSchedules } from '$lib/scheduleForStop';
+import { getScheduleForStop } from '$lib/server/scheduleForStop';
 
-export async function load({ fetch, params }) {
+export async function load({ params }) {
 	// Always today in the region's timezone. Other dates are only picked in the
 	// browser and never reach the URL, so a fresh load or refresh shows today.
 	const serviceDay = getTodayDateForInput(env.PUBLIC_OBA_TIMEZONE);
-	const scheduleForStop = await fetchScheduleForStop(fetch, params.stopID, serviceDay);
+	const response = await getScheduleForStop(params.stopID, serviceDay);
+	const { data: scheduleForStop }: ScheduleForStopRetrieveResponse = await handleOBAResponse(
+		response,
+		'stop-for-schedule'
+	).json();
 	const { stopId } = scheduleForStop.entry;
 
-	// Only what the page renders is sent, not the raw schedule.
 	return {
 		schedules: getRouteSchedules(scheduleForStop, env.PUBLIC_OBA_TIMEZONE || undefined),
 		serviceDay,

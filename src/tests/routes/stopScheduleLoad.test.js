@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
+const getScheduleForStop = vi.hoisted(() => vi.fn());
+vi.mock('$lib/server/scheduleForStop', () => ({ getScheduleForStop }));
+
 vi.mock('$env/dynamic/public', () => ({
 	env: { PUBLIC_OBA_TIMEZONE: 'America/Los_Angeles' }
 }));
@@ -9,32 +12,35 @@ import { load } from '../../routes/stops/[stopID]/schedule/+page.server';
 const stop = { id: '1_75403', name: 'Pine St & 3rd Ave' };
 
 function scheduleResponse(stopRouteSchedules = []) {
-	const data = {
-		entry: { stopId: stop.id, stopRouteSchedules },
-		references: { routes: [{ id: '1_100', shortName: '8' }], stops: [stop] }
+	return {
+		code: 200,
+		data: {
+			entry: { stopId: stop.id, stopRouteSchedules },
+			references: { routes: [{ id: '1_100', shortName: '8' }], stops: [stop] }
+		}
 	};
-	return { ok: true, json: async () => ({ data }) };
 }
 
 describe('/stops/[stopID]/schedule load', () => {
 	afterEach(() => {
 		vi.useRealTimers();
+		vi.resetAllMocks();
 	});
 
 	test("loads today's schedule in the region's timezone", async () => {
 		// 8pm on Oct 2 in Los Angeles, when it's already Oct 3 in UTC
 		vi.useFakeTimers({ toFake: ['Date'] });
 		vi.setSystemTime(new Date('2026-10-03T03:00:00Z'));
-		const fetch = vi.fn().mockResolvedValue(scheduleResponse());
+		getScheduleForStop.mockResolvedValue(scheduleResponse());
 
-		const result = await load({ fetch, params: { stopID: stop.id } });
+		const result = await load({ params: { stopID: stop.id } });
 
-		expect(fetch.mock.calls[0][0]).toBe('/api/oba/schedule-for-stop/1_75403?date=2026-10-02');
+		expect(getScheduleForStop).toHaveBeenCalledWith(stop.id, '2026-10-02');
 		expect(result).toEqual({ schedules: [], serviceDay: '2026-10-02', stop, stopId: stop.id });
 	});
 
 	test("sends the schedules grouped in the region's timezone, ready to render", async () => {
-		const fetch = vi.fn().mockResolvedValue(
+		getScheduleForStop.mockResolvedValue(
 			scheduleResponse([
 				{
 					routeId: '1_100',
@@ -51,7 +57,7 @@ describe('/stops/[stopID]/schedule load', () => {
 			])
 		);
 
-		const { schedules } = await load({ fetch, params: { stopID: stop.id } });
+		const { schedules } = await load({ params: { stopID: stop.id } });
 
 		expect(schedules).toEqual([
 			{
@@ -63,11 +69,9 @@ describe('/stops/[stopID]/schedule load', () => {
 		]);
 	});
 
-	test("fails with the API's status when the schedule can't be loaded", async () => {
-		const fetch = vi.fn().mockResolvedValue({ ok: false, status: 502 });
+	test("fails when OBA can't return the schedule", async () => {
+		getScheduleForStop.mockResolvedValue({ code: 500 });
 
-		await expect(load({ fetch, params: { stopID: '1_75403' } })).rejects.toMatchObject({
-			status: 502
-		});
+		await expect(load({ params: { stopID: stop.id } })).rejects.toMatchObject({ status: 500 });
 	});
 });

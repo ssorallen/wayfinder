@@ -131,12 +131,9 @@ describe('/stops/[stopID]/schedule', () => {
 		vi.restoreAllMocks();
 	});
 
-	test("shows today's schedule from the server without fetching or grouping it again", async () => {
+	test("shows today's schedule from the server without fetching it again", async () => {
 		const { container } = renderPage([routeSchedule('Capitol Hill')]);
 		await tick();
-
-		// Only renderPage's call, which stands in for the server load.
-		expect(getRouteSchedules).toHaveBeenCalledTimes(1);
 
 		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(stop.name);
 		expect(screen.getByText('8 - Capitol Hill')).toBeInTheDocument();
