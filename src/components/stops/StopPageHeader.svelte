@@ -75,11 +75,11 @@
 			</div>
 		</div>
 		<TabContainer>
-			<TabLink href="/stops/{stopId}" current={$page.route.id === '/stops/[stopID]'}
+			<TabLink href="/stops/{encodeURIComponent(stopId)}" current={$page.route.id === '/stops/[stopID]'}
 				>{$isLoading ? '' : $t('arrivals_and_departures_for_stop.title')}</TabLink
 			>
 			<TabLink
-				href="/stops/{stopId}/schedule"
+				href="/stops/{encodeURIComponent(stopId)}/schedule"
 				current={$page.route.id === '/stops/[stopID]/schedule'}
 				>{$isLoading ? '' : $t('schedule_for_stop.route_schedules')}</TabLink
 			>
