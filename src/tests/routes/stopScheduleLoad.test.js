@@ -74,4 +74,15 @@ describe('/stops/[stopID]/schedule load', () => {
 
 		await expect(load({ params: { stopID: stop.id } })).rejects.toMatchObject({ status: 500 });
 	});
+
+	test.each([
+		['an empty response', null],
+		['code 404', { code: 404 }]
+	])('is not found when OBA answers for the stop with %s', async (_, response) => {
+		getScheduleForStop.mockResolvedValue(response);
+
+		await expect(load({ params: { stopID: '1_99999999' } })).rejects.toMatchObject({
+			status: 404
+		});
+	});
 });

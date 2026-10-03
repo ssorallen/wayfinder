@@ -319,6 +319,15 @@ describe('GET /api/oba/schedule-for-stop/[stopId]', () => {
 		}
 	);
 
+	it("passes along OBA's empty response for a stop that doesn't exist", async () => {
+		mockRetrieve.mockResolvedValue(null);
+
+		await request('2026-08-24', 'MTS_doesnotexist');
+
+		expect(mockScheduleForRouteRetrieve).not.toHaveBeenCalled();
+		expect(mockHandleOBAResponse).toHaveBeenCalledWith(null, 'stop-for-schedule');
+	});
+
 	it('skips malformed nested entries while enriching healthy directions', async () => {
 		const response = stopResponse();
 		response.data.entry.stopRouteSchedules.push(

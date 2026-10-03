@@ -11,12 +11,13 @@ import { getAgencyFilter, filterByRouteId } from '$lib/agencyFilter.js';
  * @param {string} date - YYYY-MM-DD service day. The caller resolves an undated
  *   request in the region's timezone; an undated stop response's entry.date is
  *   wall-clock time, not a service-day key.
- * @returns {Promise<import('onebusaway-sdk/resources/schedule-for-stop').ScheduleForStopRetrieveResponse>}
+ * @returns {Promise<import('onebusaway-sdk/resources/schedule-for-stop').ScheduleForStopRetrieveResponse | null>}
+ *   Null for a stop that doesn't exist: OBA answers with an empty response.
  */
 export async function getScheduleForStop(stopId, date) {
 	const response = await oba.scheduleForStop.retrieve(stopId, { date });
 
-	if (response.data?.entry?.stopRouteSchedules) {
+	if (response?.data?.entry?.stopRouteSchedules) {
 		const routeSchedules = filterByRouteId(
 			response.data.entry.stopRouteSchedules,
 			getAgencyFilter()
