@@ -75,7 +75,9 @@
 			</div>
 		</div>
 		<TabContainer>
-			<TabLink href="/stops/{encodeURIComponent(stopId)}" current={$page.route.id === '/stops/[stopID]'}
+			<TabLink
+				href="/stops/{encodeURIComponent(stopId)}"
+				current={$page.route.id === '/stops/[stopID]'}
 				>{$isLoading ? '' : $t('arrivals_and_departures_for_stop.title')}</TabLink
 			>
 			<TabLink

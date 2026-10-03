@@ -2,7 +2,8 @@ import { render, screen } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { tick } from 'svelte';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { dateToServiceDay } from '$lib/scheduleForStop';
+import { env } from '$env/dynamic/public';
+import { dateToServiceDay, getRouteSchedules } from '$lib/scheduleForStop';
 import StopSchedulePage from '../../routes/stops/[stopID]/schedule/+page.svelte';
 
 vi.mock('$env/dynamic/public', () => ({
@@ -68,13 +69,19 @@ function scheduleResponse(stopRouteSchedules) {
 	return { ok: true, json: async () => ({ data: scheduleForStop(stopRouteSchedules) }) };
 }
 
-// Renders the page with what the server load provides: today's schedule.
+// Renders the page with what the server load provides: today's schedules,
+// already grouped, and the stop.
 function renderPage(stopRouteSchedules, routes) {
 	return render(StopSchedulePage, {
 		props: {
 			data: {
-				scheduleForStop: scheduleForStop(stopRouteSchedules, routes),
-				serviceDay: dateToServiceDay(new Date())
+				schedules: getRouteSchedules(
+					scheduleForStop(stopRouteSchedules, routes),
+					env.PUBLIC_OBA_TIMEZONE
+				),
+				serviceDay: dateToServiceDay(new Date()),
+				stop,
+				stopId: stop.id
 			}
 		}
 	});
@@ -124,9 +131,12 @@ describe('/stops/[stopID]/schedule', () => {
 		vi.restoreAllMocks();
 	});
 
-	test("shows today's schedule from the server without fetching it again", async () => {
+	test("shows today's schedule from the server without fetching or grouping it again", async () => {
 		const { container } = renderPage([routeSchedule('Capitol Hill')]);
 		await tick();
+
+		// Only renderPage's call, which stands in for the server load.
+		expect(getRouteSchedules).toHaveBeenCalledTimes(1);
 
 		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(stop.name);
 		expect(screen.getByText('8 - Capitol Hill')).toBeInTheDocument();

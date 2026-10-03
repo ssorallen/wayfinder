@@ -1,6 +1,7 @@
 import type { ScheduleForStopRetrieveResponse } from 'onebusaway-sdk/resources/schedule-for-stop';
 import { error } from '@sveltejs/kit';
 import { localTimeFormat, msToPlainTime, plainTimeToDate } from '$lib/dateTimeFormat.js';
+import { removeAgencyPrefix } from '$lib/utils';
 
 type ScheduleStopTime =
 	ScheduleForStopRetrieveResponse.Data.Entry.StopRouteSchedule.StopRouteDirectionSchedule.ScheduleStopTime & {
@@ -14,6 +15,14 @@ interface ScheduleTableStopTime {
 	arrivalTime: string;
 	destination: string;
 	isShortLine: boolean;
+}
+
+export interface RouteSchedule {
+	stopTimes: Record<number, ScheduleTableStopTime[]>;
+	/**
+	 * The table's label: route name and the direction's headsign
+	 */
+	tripHeadsign: string;
 }
 
 /**
@@ -63,6 +72,37 @@ export function serviceDayToDate(serviceDay: string): Date {
  */
 export function dateToServiceDay(date: Date): string {
 	return new Temporal.PlainDate(date.getFullYear(), date.getMonth() + 1, date.getDate()).toString();
+}
+
+/**
+ * One schedule table per route direction at the stop. The schedule page's
+ * server load groups today's this way, so the page arrives ready to render and
+ * the browser doesn't group it again; the page groups other dates as they load.
+ */
+export function getRouteSchedules(
+	scheduleForStop: ScheduleForStopRetrieveResponse.Data,
+	timeZone?: string
+): RouteSchedule[] {
+	const routeReference = new Map(
+		scheduleForStop.references.routes.map((route) => [route.id, route])
+	);
+
+	return scheduleForStop.entry.stopRouteSchedules.flatMap((routeSchedule) => {
+		const route = routeReference.get(routeSchedule.routeId);
+		// A route missing from the references (or without a name) is labeled by
+		// its id rather than having its times dropped.
+		const routeName =
+			route?.shortName || route?.longName || removeAgencyPrefix(routeSchedule.routeId);
+
+		return routeSchedule.stopRouteDirectionSchedules.map((directionSchedule) => ({
+			stopTimes: groupStopTimesByHour(
+				directionSchedule.scheduleStopTimes,
+				directionSchedule.tripHeadsign,
+				timeZone
+			),
+			tripHeadsign: `${routeName} - ${directionSchedule.tripHeadsign}`
+		}));
+	});
 }
 
 /**

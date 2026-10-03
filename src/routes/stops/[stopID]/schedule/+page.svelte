@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { ScheduleForStopRetrieveResponse } from 'onebusaway-sdk/resources/schedule-for-stop';
 	import { env } from '$env/dynamic/public';
 	import RouteScheduleTable from '$components/schedule-for-stop/RouteScheduleTable.svelte';
 	import StopPageHeader from '$components/stops/StopPageHeader.svelte';
@@ -7,10 +6,10 @@
 	import {
 		dateToServiceDay,
 		fetchScheduleForStop,
-		groupStopTimesByHour,
+		getRouteSchedules,
+		type RouteSchedule,
 		serviceDayToDate
 	} from '$lib/scheduleForStop';
-	import { removeAgencyPrefix } from '$lib/utils';
 	import Accordion from '$components/containers/Accordion.svelte';
 	import AccordionItem from '$components/containers/AccordionItem.svelte';
 	import { Datepicker } from 'flowbite-svelte';
@@ -22,10 +21,12 @@
 
 	const regionTz = env.PUBLIC_OBA_TIMEZONE || undefined;
 
-	// Today's schedule comes from the server. Other dates replace it here in the
-	// browser only, so a refresh always starts from today.
+	// Today's schedules come from the server, already grouped. Other dates
+	// replace them here in the browser only, so a refresh always starts from today.
 	let selectedDate: Date | null = $derived(serviceDayToDate(data.serviceDay));
-	let scheduleForStop: ScheduleForStopRetrieveResponse.Data | null = $derived(data.scheduleForStop);
+
+	// Null when a request for another date fails.
+	let schedules: RouteSchedule[] | null = $derived(data.schedules);
 	let loading = $state(false);
 	let accordionComponent: Accordion | null = $state(null);
 	let allRoutesExpanded = $state(false);
@@ -44,13 +45,10 @@
 		};
 	});
 
-	// The stop doesn't vary by date, so it comes from the server's response,
-	// which a failed request for another date can't clear.
-	const stopId = $derived(data.scheduleForStop.entry.stopId);
-	const stop = $derived(
-		data.scheduleForStop.references.stops.find((reference) => reference.id === stopId)
-	);
-	const schedules = $derived(scheduleForStop ? getSchedules(scheduleForStop) : []);
+	// The stop doesn't vary by date, so it comes from the server's data, which a
+	// failed request for another date can't clear.
+	const stop = $derived(data.stop);
+	const stopId = $derived(data.stopId);
 
 	function selectDate(date: Date | null) {
 		selectedDate = date;
@@ -69,41 +67,17 @@
 			const result = await fetchScheduleForStop(fetch, stopId, serviceDay, {
 				signal: requestController.signal
 			});
-			if (!requestController.signal.aborted) scheduleForStop = result;
+			if (!requestController.signal.aborted) schedules = getRouteSchedules(result, regionTz);
 		} catch (error) {
 			if (requestController.signal.aborted) return;
 			console.error('Error fetching schedules:', error);
 			// Don't leave the previous date's schedules looking current.
-			scheduleForStop = null;
+			schedules = null;
 		} finally {
 			if (scheduleRequestController === requestController) {
 				loading = false;
 			}
 		}
-	}
-
-	function getSchedules(scheduleForStop: ScheduleForStopRetrieveResponse.Data) {
-		const routeReference = new Map(
-			scheduleForStop.references.routes.map((route) => [route.id, route])
-		);
-
-		// One table per direction schedule.
-		return scheduleForStop.entry.stopRouteSchedules.flatMap((routeSchedule) => {
-			const route = routeReference.get(routeSchedule.routeId);
-			// A route missing from the references (or without a name) is labeled by
-			// its id rather than having its times dropped.
-			const routeName =
-				route?.shortName || route?.longName || removeAgencyPrefix(routeSchedule.routeId);
-
-			return routeSchedule.stopRouteDirectionSchedules.map((directionSchedule) => ({
-				stopTimes: groupStopTimesByHour(
-					directionSchedule.scheduleStopTimes,
-					directionSchedule.tripHeadsign,
-					regionTz
-				),
-				tripHeadsign: `${routeName} - ${directionSchedule.tripHeadsign}`
-			}));
-		});
 	}
 
 	function toggleAllRoutes() {
@@ -170,7 +144,7 @@
 				aria-busy={loading}
 				class="flex-1 rounded-lg border border-gray-200 bg-white p-2 dark:border-gray-700 dark:bg-black"
 			>
-				{#if schedules.length > 0}
+				{#if schedules?.length}
 					<!-- While another date loads, these stay in place, dimmed, until its schedules arrive. -->
 					<div
 						class="transition-opacity {loading ? 'opacity-50' : ''}"
@@ -192,7 +166,7 @@
 					<Accordion>
 						<Skeleton class="h-12 rounded-none" />
 					</Accordion>
-				{:else if !scheduleForStop}
+				{:else if !schedules}
 					<!-- Only a failed request for another date leaves no schedule. -->
 					<p role="alert" class="text-center text-red-600 dark:text-red-400">
 						{$isLoading ? '' : $t('schedule_for_stop.schedules_load_failed')}
