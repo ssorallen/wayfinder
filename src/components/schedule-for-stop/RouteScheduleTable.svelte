@@ -27,8 +27,8 @@
 		};
 	}
 
-	function extractMinutes(arrivalTime) {
-		return arrivalTime.replace(/[AP]M/, '').split(':')[1];
+	function formatMinute(minute) {
+		return String(minute).padStart(2, '0');
 	}
 </script>
 
@@ -88,7 +88,7 @@
 					<tr class="hover:bg-gray-100 dark:hover:bg-gray-900">
 						<td
 							class="border px-6 py-3 text-center text-lg font-semibold dark:border-gray-700 dark:text-white"
-							title="Full Time: {hour}:{extractMinutes(times[0].arrivalTime)}"
+							title="Full Time: {hour}:{formatMinute(times[0].minute)}"
 						>
 							{convert24HourTo12Hour(hour)}
 							<span class="text-sm text-gray-600 dark:text-gray-100">AM</span>
@@ -102,7 +102,7 @@
 										class="inline-flex items-center gap-1.5 rounded-md border border-amber-300 bg-amber-50 px-2 py-1 text-sm font-semibold text-amber-950 shadow-sm dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-100"
 										data-short-line="true"
 									>
-										<span>{extractMinutes(stopTime.arrivalTime)}</span>
+										<span>{formatMinute(stopTime.minute)}</span>
 										<span
 											class="border-l border-amber-300 pl-1.5 text-xs font-medium dark:border-amber-700"
 										>
@@ -115,7 +115,7 @@
 									</span>
 								{:else}
 									<span class="rounded bg-gray-50 px-2 py-1 dark:bg-gray-800">
-										{extractMinutes(stopTime.arrivalTime)}
+										{formatMinute(stopTime.minute)}
 									</span>
 								{/if}
 							{/each}
@@ -144,7 +144,7 @@
 					<tr class="hover:bg-gray-100 dark:hover:bg-gray-800">
 						<td
 							class="border px-6 py-3 text-center text-lg font-semibold dark:border-gray-700 dark:text-white"
-							title="Full Time: {hour}:{extractMinutes(times[0].arrivalTime)}"
+							title="Full Time: {hour}:{formatMinute(times[0].minute)}"
 						>
 							{convert24HourTo12Hour(hour)}
 							<span class="text-sm text-gray-600 dark:text-gray-100">PM</span>
@@ -158,7 +158,7 @@
 										class="inline-flex items-center gap-1.5 rounded-md border border-amber-300 bg-amber-50 px-2 py-1 text-sm font-semibold text-amber-950 shadow-sm dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-100"
 										data-short-line="true"
 									>
-										<span>{extractMinutes(stopTime.arrivalTime)}</span>
+										<span>{formatMinute(stopTime.minute)}</span>
 										<span
 											class="border-l border-amber-300 pl-1.5 text-xs font-medium dark:border-amber-700"
 										>
@@ -171,7 +171,7 @@
 									</span>
 								{:else}
 									<span class="rounded bg-gray-50 px-2 py-1 dark:bg-gray-800">
-										{extractMinutes(stopTime.arrivalTime)}
+										{formatMinute(stopTime.minute)}
 									</span>
 								{/if}
 							{/each}
