@@ -92,20 +92,32 @@ export function getRouteSchedules(
 	);
 
 	return scheduleForStop.entry.stopRouteSchedules.flatMap((routeSchedule) => {
+		// The API route passes malformed entries through (see `addTripHeadsigns`);
+		// skip them here too rather than failing the whole page.
+		const directions = routeSchedule?.stopRouteDirectionSchedules;
+		if (!routeSchedule?.routeId || !Array.isArray(directions)) return [];
+
 		const route = routeReference.get(routeSchedule.routeId);
+
 		// A route missing from the references (or without a name) is labeled by
 		// its id rather than having its times dropped.
 		const routeName =
 			route?.shortName || route?.longName || removeAgencyPrefix(routeSchedule.routeId);
 
-		return routeSchedule.stopRouteDirectionSchedules.map((directionSchedule) => ({
-			stopTimes: groupStopTimesByHour(
-				directionSchedule.scheduleStopTimes,
-				directionSchedule.tripHeadsign,
-				timeZone
-			),
-			tripHeadsign: `${routeName} - ${directionSchedule.tripHeadsign}`
-		}));
+		return directions.flatMap((directionSchedule) =>
+			Array.isArray(directionSchedule?.scheduleStopTimes)
+				? [
+						{
+							stopTimes: groupStopTimesByHour(
+								directionSchedule.scheduleStopTimes,
+								directionSchedule.tripHeadsign,
+								timeZone
+							),
+							tripHeadsign: `${routeName} - ${directionSchedule.tripHeadsign}`
+						}
+					]
+				: []
+		);
 	});
 }
 
@@ -126,6 +138,10 @@ export function groupStopTimesByHour(
 ): Record<number, ScheduleTableStopTime[]> {
 	const grouped: Record<number, ScheduleTableStopTime[]> = {};
 	for (const stopTime of stopTimes) {
+		// A time without a valid arrival can't be placed in an hour; skip it so it
+		// doesn't take down the rest of the schedule.
+		if (!Number.isFinite(stopTime?.arrivalTime)) continue;
+
 		const time = msToPlainTime(stopTime.arrivalTime, timeZone);
 		if (!grouped[time.hour]) grouped[time.hour] = [];
 

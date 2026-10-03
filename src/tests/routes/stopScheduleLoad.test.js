@@ -69,6 +69,43 @@ describe('/stops/[stopID]/schedule load', () => {
 		]);
 	});
 
+	test('skips malformed entries instead of failing the page', async () => {
+		getScheduleForStop.mockResolvedValue(
+			scheduleResponse([
+				null,
+				{ routeId: '1_missing' },
+				{ routeId: '1_invalid', stopRouteDirectionSchedules: {} },
+				{
+					routeId: '1_100',
+					stopRouteDirectionSchedules: [
+						null,
+						{},
+						{ scheduleStopTimes: null },
+						{
+							scheduleStopTimes: [
+								null,
+								{},
+								{ arrivalTime: new Date('2026-10-02T15:05:00Z').getTime(), tripId: '1_trip' }
+							],
+							tripHeadsign: 'Capitol Hill'
+						}
+					]
+				}
+			])
+		);
+
+		const { schedules } = await load({ params: { stopID: stop.id } });
+
+		expect(schedules).toEqual([
+			{
+				stopTimes: {
+					8: [{ destination: 'Capitol Hill', isShortLine: false, minute: 5 }]
+				},
+				tripHeadsign: '8 - Capitol Hill'
+			}
+		]);
+	});
+
 	test("fails when OBA can't return the schedule", async () => {
 		getScheduleForStop.mockResolvedValue({ code: 500 });
 

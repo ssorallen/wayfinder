@@ -94,6 +94,22 @@ describe('groupStopTimesByHour', () => {
 		expect(grouped[8][0]).toMatchObject({ isShortLine: false, destination: 'Kearny Mesa' });
 	});
 
+	it('skips stop times without a valid arrival time', () => {
+		const grouped = groupStopTimesByHour(
+			[
+				null,
+				{},
+				{ arrivalTime: NaN },
+				{ arrivalTime: new Date('2026-08-24T08:05:00').getTime(), tripHeadsign: 'Kearny Mesa' }
+			],
+			'Kearny Mesa'
+		);
+
+		expect(grouped).toEqual({
+			8: [{ destination: 'Kearny Mesa', isShortLine: false, minute: 5 }]
+		});
+	});
+
 	it("groups and shows times in the given timezone, not the runtime's", () => {
 		// 8:05am in Los Angeles is 3:05pm UTC, the test runner's timezone.
 		const grouped = groupStopTimesByHour(
