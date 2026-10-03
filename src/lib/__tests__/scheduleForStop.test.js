@@ -1,5 +1,60 @@
-import { describe, expect, it } from 'vitest';
-import { groupStopTimesByHour } from '$lib/scheduleForStop.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+	dateToServiceDay,
+	fetchScheduleForStop,
+	groupStopTimesByHour,
+	serviceDayToDate
+} from '$lib/scheduleForStop';
+
+describe('fetchScheduleForStop', () => {
+	it('requests the service day from the API route and returns its data', async () => {
+		const data = { entry: { stopId: 'MTA NYCT_1/2' } };
+		const fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data }) });
+		const { signal } = new AbortController();
+
+		const result = await fetchScheduleForStop(fetch, 'MTA NYCT_1/2', '2026-10-05', { signal });
+
+		expect(fetch).toHaveBeenCalledWith(
+			'/api/oba/schedule-for-stop/MTA%20NYCT_1%2F2?date=2026-10-05',
+			{ signal }
+		);
+		expect(result).toBe(data);
+	});
+
+	it("throws an error carrying the API's status when the request fails", async () => {
+		const fetch = vi.fn().mockResolvedValue({ ok: false, status: 503 });
+
+		await expect(fetchScheduleForStop(fetch, '1_75403', '2026-10-05')).rejects.toMatchObject({
+			status: 503
+		});
+	});
+});
+
+describe('service day conversions', () => {
+	const originalTimeZone = process.env.TZ;
+
+	afterEach(() => {
+		process.env.TZ = originalTimeZone;
+	});
+
+	it('keeps the calendar day in timezones east of UTC', () => {
+		// Local midnight in Berlin is still the previous day in UTC, so
+		// `toISOString()` would give 2026-10-04.
+		process.env.TZ = 'Europe/Berlin';
+
+		const date = serviceDayToDate('2026-10-05');
+
+		expect(date.toISOString()).toBe('2026-10-04T22:00:00.000Z');
+		expect(dateToServiceDay(date)).toBe('2026-10-05');
+	});
+
+	it('uses the local day of a time late in the evening west of UTC', () => {
+		// 8pm on Oct 2 in Los Angeles is already Oct 3 in UTC.
+		process.env.TZ = 'America/Los_Angeles';
+
+		expect(dateToServiceDay(new Date('2026-10-03T03:00:00Z'))).toBe('2026-10-02');
+	});
+});
 
 describe('groupStopTimesByHour', () => {
 	it('uses the per-trip headsign when schedule-for-stop omits stopHeadsign', () => {

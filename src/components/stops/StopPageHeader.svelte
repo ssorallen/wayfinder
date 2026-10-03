@@ -2,7 +2,6 @@
 	import { ArrowLeft, Map, MapPin } from '@lucide/svelte';
 	import CompassArrow from '$components/controls/CompassArrow.svelte';
 	import FavoriteToggle from '$components/favorites/FavoriteToggle.svelte';
-	import Skeleton from '$components/Skeleton.svelte';
 	import TabContainer from '$components/tabs/TabContainer.svelte';
 	import TabLink from '$components/tabs/TabLink.svelte';
 	import { page } from '$app/stores';
@@ -42,13 +41,9 @@
 
 	<div class="text-center">
 		<div class="flex items-center justify-center gap-2">
-			{#if stopName}
-				<h1 class="text-3xl font-bold text-brand-accent">
-					{stopName}
-				</h1>
-			{:else}
-				<Skeleton class="h-9 w-64" />
-			{/if}
+			<h1 class="text-3xl font-bold text-brand-accent">
+				{stopName}
+			</h1>
 			<FavoriteToggle
 				disabled={stopLat == null || stopLon == null}
 				type="stop"
@@ -73,7 +68,9 @@
 				{#if stopDirection}
 					{directionLabel(stopDirection, $t) ?? ''}
 				{:else}
-					<Skeleton class="w-8 self-stretch !bg-gray-300" />
+					<span class="text-gray-600">
+						{$isLoading ? '' : $t('schedule_for_stop.no_direction')}
+					</span>
 				{/if}
 			</div>
 		</div>

@@ -27,6 +27,7 @@ vi.mock('svelte-i18n', () => ({
 				const translations = {
 					'schedule_for_stop.stop_id': 'Stop ID',
 					'schedule_for_stop.direction': 'Direction',
+					'schedule_for_stop.no_direction': 'None',
 					'arrivals_and_departures_for_stop.title': 'Arrivals & Departures',
 					'schedule_for_stop.route_schedules': 'Route Schedules',
 					'navigation.back_to_map': 'Back to Map',
@@ -119,6 +120,15 @@ describe('StopPageHeader', () => {
 
 		expect(screen.getByText('Direction:')).toBeInTheDocument();
 		expect(screen.getByText('North')).toBeInTheDocument();
+	});
+
+	test('shows a faded "None" when the stop has no direction', () => {
+		render(StopPageHeader, {
+			props: { ...defaultProps, stopDirection: '' }
+		});
+
+		expect(screen.getByText('Direction:')).toBeInTheDocument();
+		expect(screen.getByText('None')).toHaveClass('text-gray-600');
 	});
 
 	test('has proper header styling classes', () => {

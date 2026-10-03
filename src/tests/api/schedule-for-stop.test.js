@@ -19,7 +19,7 @@ vi.mock('$lib/agencyFilter.js', () => ({
 	getAgencyFilter: mockGetAgencyFilter
 }));
 
-import { groupStopTimesByHour } from '$lib/scheduleForStop.js';
+import { groupStopTimesByHour } from '$lib/scheduleForStop';
 
 const region = vi.hoisted(() => ({ timeZone: 'America/Los_Angeles' }));
 vi.mock('$env/dynamic/public', () => ({
