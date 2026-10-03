@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/public';
-import { getTodayDateForInput } from '$lib/dateTimeInput.js';
+import { getTodayDateForInput } from '$lib/dateTimeInput';
 import oba, { handleOBAResponse } from '$lib/obaSdk';
 import { getTripHeadsigns } from '$lib/server/tripHeadsigns.js';
 import { getAgencyFilter, filterByRouteId } from '$lib/agencyFilter.js';

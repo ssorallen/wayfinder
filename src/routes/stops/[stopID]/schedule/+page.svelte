@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ScheduleForStopRetrieveResponse } from 'onebusaway-sdk/resources/schedule-for-stop';
+	import { env } from '$env/dynamic/public';
 	import RouteScheduleTable from '$components/schedule-for-stop/RouteScheduleTable.svelte';
 	import StopPageHeader from '$components/stops/StopPageHeader.svelte';
 	import StandalonePage from '$components/StandalonePage.svelte';
@@ -18,6 +19,8 @@
 	import Skeleton from '$components/Skeleton.svelte';
 
 	let { data } = $props();
+
+	const regionTz = env.PUBLIC_OBA_TIMEZONE || undefined;
 
 	// Today's schedule comes from the server. Other dates replace it here in the
 	// browser only, so a refresh always starts from today.
@@ -95,7 +98,8 @@
 			return routeSchedule.stopRouteDirectionSchedules.map((directionSchedule) => ({
 				stopTimes: groupStopTimesByHour(
 					directionSchedule.scheduleStopTimes,
-					directionSchedule.tripHeadsign
+					directionSchedule.tripHeadsign,
+					regionTz
 				),
 				tripHeadsign: `${routeName} - ${directionSchedule.tripHeadsign}`
 			}));

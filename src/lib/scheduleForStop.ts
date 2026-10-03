@@ -1,6 +1,6 @@
 import type { ScheduleForStopRetrieveResponse } from 'onebusaway-sdk/resources/schedule-for-stop';
 import { error } from '@sveltejs/kit';
-import { msToTimeString } from '$lib/dateTimeFormat.js';
+import { localTimeFormat, msToPlainTime, plainTimeToDate } from '$lib/dateTimeFormat.js';
 
 type ScheduleStopTime =
 	ScheduleForStopRetrieveResponse.Data.Entry.StopRouteSchedule.StopRouteDirectionSchedule.ScheduleStopTime & {
@@ -69,21 +69,25 @@ export function dateToServiceDay(date: Date): string {
  * Arrange a direction's stop times for the schedule table and flag trips that
  * end before the direction's normal destination.
  *
+ * Pass the region's timezone so times are grouped and shown as the agency
+ * schedules them, not shifted to the viewer's (or the server's) timezone.
+ *
  * `stopHeadsign` is not populated by OBA's schedule-for-stop endpoint. The
  * route handler adds the per-trip `tripHeadsign` from schedule-for-route.
  */
 export function groupStopTimesByHour(
 	stopTimes: ScheduleStopTime[],
-	directionHeadsign: string
+	directionHeadsign: string,
+	timeZone?: string
 ): Record<number, ScheduleTableStopTime[]> {
 	const grouped: Record<number, ScheduleTableStopTime[]> = {};
 	for (const stopTime of stopTimes) {
-		const hour = new Date(stopTime.arrivalTime).getHours();
-		if (!grouped[hour]) grouped[hour] = [];
+		const time = msToPlainTime(stopTime.arrivalTime, timeZone);
+		if (!grouped[time.hour]) grouped[time.hour] = [];
 
 		const destination = stopTime.tripHeadsign?.trim() || directionHeadsign;
-		grouped[hour].push({
-			arrivalTime: msToTimeString(stopTime.arrivalTime),
+		grouped[time.hour].push({
+			arrivalTime: localTimeFormat.format(plainTimeToDate(time)),
 			destination,
 			isShortLine: destination !== directionHeadsign
 		});

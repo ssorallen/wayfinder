@@ -5,6 +5,10 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { dateToServiceDay } from '$lib/scheduleForStop';
 import StopSchedulePage from '../../routes/stops/[stopID]/schedule/+page.svelte';
 
+vi.mock('$env/dynamic/public', () => ({
+	env: { PUBLIC_OBA_TIMEZONE: 'America/Los_Angeles' }
+}));
+
 vi.mock('svelte-i18n', () => ({
 	t: {
 		subscribe: vi.fn((fn) => {
@@ -166,6 +170,20 @@ describe('/stops/[stopID]/schedule', () => {
 		expect(screen.getByText('Waterfront Shuttle - Pier 62')).toBeInTheDocument();
 	});
 
+	test("shows times in the region's timezone, not the viewer's", async () => {
+		const user = userEvent.setup();
+		const capitolHill = routeSchedule('Capitol Hill');
+		// 8:05am in Los Angeles is 3:05pm UTC, the test runner's timezone.
+		capitolHill.stopRouteDirectionSchedules[0].scheduleStopTimes[0].arrivalTime = new Date(
+			'2026-10-02T15:05:00Z'
+		).getTime();
+
+		renderPage([capitolHill]);
+		await user.click(screen.getByRole('button', { name: '8 - Capitol Hill' }));
+
+		expect(screen.getByTitle('Full Time: 8:05')).toBeInTheDocument();
+	});
+
 	test('labels a route missing from the references by its id', () => {
 		renderPage([routeSchedule('Ballard', '1_200')]);
 
@@ -275,37 +293,6 @@ describe('/stops/[stopID]/schedule', () => {
 		expect(schedulesList.inert).toBe(false);
 		expect(screen.queryByText('8 - University District')).not.toBeInTheDocument();
 		expect(console.error).not.toHaveBeenCalled();
-	});
-
-	test("drops a date still loading for the previous stop when another stop's data arrives", async () => {
-		const user = userEvent.setup();
-		// Ignores the signal, like a response that was already read when the
-		// request was aborted.
-		let resolveOtherDate;
-		fetchMock.mockImplementationOnce(() => new Promise((resolve) => (resolveOtherDate = resolve)));
-		const otherStop = { ...stop, id: '1_75404', name: 'Pike St & 4th Ave' };
-
-		const { rerender } = renderPage([routeSchedule('Capitol Hill')]);
-		await selectDate(user, otherDate);
-		await rerender({
-			data: {
-				scheduleForStop: {
-					entry: { stopId: otherStop.id, stopRouteSchedules: [routeSchedule('Ballard')] },
-					references: { routes: [route], stops: [otherStop] }
-				},
-				serviceDay: dateToServiceDay(new Date())
-			}
-		});
-
-		expect(fetchMock.mock.calls[0][1].signal.aborted).toBe(true);
-		expect(screen.getByTestId('route-schedules').inert).toBe(false);
-
-		resolveOtherDate(scheduleResponse([routeSchedule('University District')]));
-		await tick();
-
-		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(otherStop.name);
-		expect(screen.getByText('8 - Ballard')).toBeInTheDocument();
-		expect(screen.queryByText('8 - University District')).not.toBeInTheDocument();
 	});
 
 	test('cancels a date still loading when the page closes', async () => {

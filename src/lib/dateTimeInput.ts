@@ -12,7 +12,7 @@ const fourDigit24HourTimeFormat = new Intl.DateTimeFormat(undefined, {
  * @param {string} [timeZone] - IANA timezone (e.g. "America/Los_Angeles"). Defaults to browser's local timezone.
  * @returns {string} Today's date in YYYY-MM-DD format
  */
-export function getTodayDateForInput(timeZone) {
+export function getTodayDateForInput(timeZone: string): string {
 	try {
 		return Temporal.Now.plainDateISO(timeZone).toJSON();
 	} catch (err) {
@@ -30,7 +30,7 @@ export function getTodayDateForInput(timeZone) {
  * @param {string} [timeZone] - IANA timezone (e.g. "America/Los_Angeles"). Defaults to browser's local timezone.
  * @returns {string} Current time in HH:MM format
  */
-export function getCurrentTimeForInput(timeZone) {
+export function getCurrentTimeForInput(timeZone: string): string {
 	let now;
 	try {
 		now = Temporal.Now.plainTimeISO(timeZone);
