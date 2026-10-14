@@ -43,6 +43,7 @@ describe('OverflowMenu', () => {
 		const button = screen.getByRole('button', { name: 'More navigation options' });
 		await user.click(button);
 
+		expect(button).toHaveAttribute('aria-expanded', 'true');
 		expect(screen.queryByRole('link')).not.toBeInTheDocument();
 	});
 
@@ -70,6 +71,7 @@ describe('OverflowMenu', () => {
 		const button = screen.getByRole('button', { name: 'More navigation options' });
 		await user.click(button);
 
+		expect(button).toHaveAttribute('aria-expanded', 'true');
 		expect(await screen.findByRole('link', { name: 'About' })).toBeInTheDocument();
 
 		await user.click(document.body);

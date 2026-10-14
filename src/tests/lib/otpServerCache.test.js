@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 let mockOtpServerUrl = 'https://otp.test.example.com';
 
@@ -21,6 +21,10 @@ describe('otpServerCache', () => {
 
 		const { clearOtpCache } = await import('$lib/otpServerCache.js');
 		clearOtpCache();
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
 	});
 
 	it('detects OTP 2.x as graphql from JSON response with version.major = 2', async () => {
