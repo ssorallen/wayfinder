@@ -147,6 +147,8 @@
 			trigger="click"
 			triggeredBy="#language-switcher-trigger"
 		>
+			<!-- static list, never reorders -->
+			<!-- eslint-disable-next-line svelte/require-each-key -->
 			{#each languages as lang}
 				<button
 					type="button"
