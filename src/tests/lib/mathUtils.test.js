@@ -274,6 +274,77 @@ describe('calculateBoundsFromAgencies', () => {
 		});
 	});
 
+	it('includes an agency on the equator', () => {
+		const result = calculateBoundsFromAgencies([{ lat: 0, lon: 36.8, latSpan: 1, lonSpan: 1 }]);
+
+		expect(result).toEqual({
+			north: 0.5,
+			south: -0.5,
+			east: 37.3,
+			west: 36.3
+		});
+	});
+
+	it('includes an agency on the prime meridian', () => {
+		const result = calculateBoundsFromAgencies([{ lat: 51.5, lon: 0, latSpan: 1, lonSpan: 2 }]);
+
+		expect(result).toEqual({
+			north: 52,
+			south: 51,
+			east: 1,
+			west: -1
+		});
+	});
+
+	it('includes an agency at the origin', () => {
+		const result = calculateBoundsFromAgencies([{ lat: 0, lon: 0, latSpan: 1, lonSpan: 1 }]);
+
+		expect(result).toEqual({
+			north: 0.5,
+			south: -0.5,
+			east: 0.5,
+			west: -0.5
+		});
+	});
+
+	it('includes a zero coverage span as a point', () => {
+		const result = calculateBoundsFromAgencies([{ lat: 0, lon: 0, latSpan: 0, lonSpan: 0 }]);
+
+		expect(result).toEqual({
+			north: 0,
+			south: 0,
+			east: 0,
+			west: 0
+		});
+	});
+
+	it('returns null when no agency has finite coordinates', () => {
+		const result = calculateBoundsFromAgencies([
+			{ lat: NaN, lon: 1, latSpan: 1, lonSpan: 1 },
+			{ lat: 1, lon: Infinity, latSpan: 1, lonSpan: 1 },
+			{ lat: '0', lon: 1, latSpan: 1, lonSpan: 1 },
+			{ lat: 1, lon: 1, latSpan: 1 },
+			null
+		]);
+
+		expect(result).toBeNull();
+	});
+
+	it('skips non-finite agencies and keeps valid ones, including zero coordinates', () => {
+		const result = calculateBoundsFromAgencies([
+			{ lat: Infinity, lon: 10, latSpan: 1, lonSpan: 1 },
+			{ lat: 0, lon: 0, latSpan: 2, lonSpan: 4 },
+			null
+		]);
+
+		expect(result).toEqual({
+			north: 1,
+			south: -1,
+			east: 2,
+			west: -2
+		});
+	});
+
 	it('handles real Puget Sound region data', () => {
 		// Realistic data from OBA Puget Sound region
 		const agencies = [

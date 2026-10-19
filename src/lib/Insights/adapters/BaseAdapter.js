@@ -34,10 +34,15 @@ export class BaseAdapter {
 	}
 
 	async forwardEvent(envelope, requestContext) {
+		// Disabled analytics intentionally ignores malformed events so local development
+		// and tests without a complete analytics configuration remain quiet.
 		if (!this.isEnabled()) {
 			return { status: 'analytics disabled' };
 		}
 
+		// `??` rather than a default parameter: the endpoint gets this from
+		// `await request.json()`, which returns null for a literal null body and
+		// never undefined, so a default parameter never fires on the reachable case.
 		const { name, url } = envelope ?? {};
 		if (!name || !url) {
 			throw insightsError('forwardEvent requires name and url', 400);

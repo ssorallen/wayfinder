@@ -80,12 +80,14 @@ function toRadians(degrees) {
 }
 
 /**
- * Calculate bounding box from OBA agencies-with-coverage response
- * @param {Array} agencies - List of agencies from OBA API with {lat, lon, latSpan, lonSpan}
- * @returns {Object} Bounds object {north, south, east, west} or null if no valid agencies
+ * Calculate bounding box from OBA agencies-with-coverage response.
+ * Latitude and longitude of 0 are valid (equator and prime meridian). An agency
+ * is skipped only when a field is missing or not a finite number.
+ * @param {Array<{lat: number, lon: number, latSpan: number, lonSpan: number}> | null | undefined} agencies
+ * @returns {{north: number, south: number, east: number, west: number} | null} Bounds, or null if no agency has finite coordinates
  */
 export function calculateBoundsFromAgencies(agencies) {
-	if (!agencies || agencies.length === 0) {
+	if (!Array.isArray(agencies) || agencies.length === 0) {
 		return null;
 	}
 
@@ -93,18 +95,36 @@ export function calculateBoundsFromAgencies(agencies) {
 	let south = Infinity;
 	let east = -Infinity;
 	let west = Infinity;
+	let included = 0;
 
-	agencies.forEach((agency) => {
-		if (agency.lat && agency.lon && agency.latSpan && agency.lonSpan) {
-			const halfLatSpan = agency.latSpan / 2;
-			const halfLonSpan = agency.lonSpan / 2;
+	for (const agency of agencies) {
+		const lat = agency?.lat;
+		const lon = agency?.lon;
+		const latSpan = agency?.latSpan;
+		const lonSpan = agency?.lonSpan;
 
-			north = Math.max(north, agency.lat + halfLatSpan);
-			south = Math.min(south, agency.lat - halfLatSpan);
-			east = Math.max(east, agency.lon + halfLonSpan);
-			west = Math.min(west, agency.lon - halfLonSpan);
+		if (
+			!Number.isFinite(lat) ||
+			!Number.isFinite(lon) ||
+			!Number.isFinite(latSpan) ||
+			!Number.isFinite(lonSpan)
+		) {
+			continue;
 		}
-	});
+
+		const halfLatSpan = latSpan / 2;
+		const halfLonSpan = lonSpan / 2;
+
+		north = Math.max(north, lat + halfLatSpan);
+		south = Math.min(south, lat - halfLatSpan);
+		east = Math.max(east, lon + halfLonSpan);
+		west = Math.min(west, lon - halfLonSpan);
+		included += 1;
+	}
+
+	if (included === 0) {
+		return null;
+	}
 
 	return { north, south, east, west };
 }
