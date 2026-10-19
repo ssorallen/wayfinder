@@ -1,27 +1,27 @@
-<script>
-	import Modal from 'flowbite-svelte/Modal.svelte';
-	import Button from 'flowbite-svelte/Button.svelte';
+<script lang="ts">
+	import { Button } from '$components/ui/button';
+	import * as Dialog  from '$components/ui/dialog';
 	import SurveyQuestion from './SurveyQuestion.svelte';
+	import type { SurveyQuestion as TSurveyQuestion } from '$lib/types';
 	import {
 		submitHeroQuestion as submitHeroQuestionUtil,
 		updateSurveyResponse as updateSurveyResponseUtil,
 		skipSurvey,
 		submitSurvey
 	} from '$lib/Surveys/surveyUtils';
-
 	import { showSurveyModal, surveyStore } from '$stores/surveyStore';
 	import { getUserId } from '$lib/utils/user';
 	import SurveySubmitted from './SurveySubmitted.svelte';
 
 	let { stop = $bindable(null), skipHeroQuestion, surveyPublicId } = $props();
 
-	let userAnswers = $state([]);
+	let userAnswers = $state<string[]>([]);
 	let heroQuestionAnswered = $state(false);
-	let heroQuestion = $state(null);
-	let remainingQuestions = $state([]);
+	let heroQuestion = $state<TSurveyQuestion | null>(null);
+	let remainingQuestions = $state<TSurveyQuestion[]>([]);
 	let surveyPublicIdentifier = $state(null);
 	let surveySubmitted = $state(false);
-	let errors = $state([]);
+	let errors = $state<boolean[]>([]);
 
 	let currentSurvey = $state($surveyStore);
 
@@ -30,16 +30,23 @@
 		remainingQuestions = currentSurvey.questions.slice(1);
 	}
 
+	interface SurveyQuestionResponse {
+		answer: string | null;
+		question_id: number;
+		question_label: string;
+		question_type: string;
+	}
+
 	let surveyResponse = {
-		survey_id: currentSurvey.id,
+		survey_id: currentSurvey?.id,
 		user_identifier: getUserId(),
 		stop_identifier: stop?.id ?? null,
 		stop_latitude: stop?.lat ?? null,
 		stop_longitude: stop?.lon ?? null,
-		responses: []
+		responses: [] as SurveyQuestionResponse[]
 	};
 
-	function handleInputChange(event, question, index) {
+	function handleInputChange(event: InputEvent, question: TSurveyQuestion, index: number) {
 		const type = question.content.type;
 
 		if (type === 'text' || type === 'radio') {
@@ -116,15 +123,10 @@
 	}
 </script>
 
-{#if $showSurveyModal && currentSurvey}
-	<Modal
-		title={currentSurvey.name}
-		open={$showSurveyModal}
-		size="3xl"
-		classBackdrop="bg-gray-900/50 dark:bg-gray-900/80"
-		class="max-w-5xl rounded-2xl"
-	>
-		<div class="flex flex-col space-y-2">
+<Dialog.Root bind:open={$showSurveyModal}>
+	{#if currentSurvey}
+		<Dialog.Content class="md:max-w-5xl rounded-2xl">
+			<Dialog.Title>{currentSurvey.name}</Dialog.Title>
 			{#if surveySubmitted}
 				<SurveySubmitted />
 			{:else}
@@ -134,7 +136,7 @@
 							question={heroQuestion}
 							index={0}
 							value={userAnswers[0]}
-							onInputChange={(e) => handleInputChange(e, heroQuestion, 0)}
+							onInputChange={(e: InputEvent) => handleInputChange(e, heroQuestion, 0)}
 							required={heroQuestion?.required}
 							error={errors[0]}
 						/>
@@ -145,7 +147,7 @@
 									{question}
 									index={index + 1}
 									value={userAnswers[index + 1]}
-									onInputChange={(e) => handleInputChange(e, question, index + 1)}
+									onInputChange={(e: InputEvent) => handleInputChange(e, question, index + 1)}
 									required={question.required}
 									error={errors[index + 1]}
 								/>
@@ -154,42 +156,37 @@
 					{/if}
 				</div>
 
-				<div
-					class="sticky bottom-0 flex justify-end gap-4 rounded-b-2xl border-t border-gray-200 bg-white pt-4 dark:border-gray-700 dark:bg-gray-800"
-				>
+				<Dialog.Footer>
 					{#if !heroQuestionAnswered && !skipHeroQuestion}
 						<Button
 							onclick={() => skipSurvey(currentSurvey)}
-							color="red"
-							class="rounded-lg px-10 py-3 shadow-md transition-shadow hover:shadow-lg"
+							size="lg"
+							variant="outline"
 						>
 							Cancel
 						</Button>
 						<Button
 							onclick={submitHeroQuestion}
-							color="green"
-							class="rounded-lg px-10 py-3 shadow-md transition-shadow hover:shadow-lg"
+							size="lg"
 						>
 							{remainingQuestions.length === 0 ? 'Submit' : 'Next'}
 						</Button>
 					{:else if remainingQuestions.length > 0}
 						<Button
 							onclick={() => skipSurvey(currentSurvey)}
-							color="red"
-							class="rounded-lg px-10 py-3 shadow-md transition-shadow hover:shadow-lg"
+							size="lg"
 						>
 							Skip
 						</Button>
 						<Button
 							onclick={handleSubmit}
-							color="green"
-							class="rounded-lg px-10 py-3 shadow-md transition-shadow hover:shadow-lg"
+							size="lg"
 						>
 							Submit
 						</Button>
 					{/if}
-				</div>
+				</Dialog.Footer>
 			{/if}
-		</div>
-	</Modal>
-{/if}
+		</Dialog.Content>
+	{/if}
+</Dialog.Root>

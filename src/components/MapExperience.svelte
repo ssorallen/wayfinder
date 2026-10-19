@@ -23,7 +23,7 @@
 	} from '$env/static/public';
 	import SurveyModal from '$components/surveys/SurveyModal.svelte';
 	import { loadSurveys } from '$lib/Surveys/surveyUtils';
-	import { showSurveyModal } from '$stores/surveyStore';
+	import { showSurveyModal } from '$src/stores/surveyStore';
 	import { getUserId } from '$lib/utils/user';
 	import analytics from '$lib/Insights';
 	import { userLocation } from '$src/stores/userLocationStore';
@@ -505,7 +505,31 @@
 		sheetSnap = 'half';
 	}
 
+	// DO NOT COMMIT: local mock for previewing <AlertsModal>. Flip to false to disable.
+	const MOCK_ALERT = true;
+
 	async function loadAlerts() {
+		if (MOCK_ALERT) {
+			alert = {
+				descriptionText: {
+					translation: [
+						{
+							language: 'en',
+							text: 'Due to roadwork on 3rd Ave, Routes 3, 4, and 7 are detoured between Pine St and Yesler Way. Stops along 3rd Ave in this segment are temporarily closed; use stops on 2nd Ave instead.'
+						}
+					]
+				},
+				headerText: {
+					translation: [{ language: 'en', text: 'Downtown detour: Routes 3, 4, and 7' }]
+				},
+				url: {
+					translation: [{ language: 'en', text: 'https://example.com/service-alerts' }]
+				}
+			};
+			showAlertModal = true;
+			return;
+		}
+
 		try {
 			const response = await fetch('/api/oba/alerts');
 

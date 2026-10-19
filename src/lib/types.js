@@ -174,4 +174,44 @@
  * @typedef {StopFavorite | RouteFavorite} Favorite
  */
 
+/**
+ * A survey as served by the sidecar's surveys.json. Every key is always
+ * present; content carries only the keys its question type uses. An omitted
+ * button_label means the default "open_survey" label.
+ *
+ * @typedef {Object} SurveyStudy
+ * @property {string} description
+ * @property {number} id
+ * @property {string} name
+ *
+ * @typedef {{ label_text: string, type: 'label' | 'text' }
+ * 	| { label_text: string, options: string[], type: 'checkbox' | 'radio' }
+ * 	| { button_label?: 'learn_more' | 'share_feedback' | 'sign_up',
+ * 		embedded_data_fields: string[], label_text: string,
+ * 		sdk_configuration_values?: Record<string, unknown>, survey_provider: string,
+ * 		type: 'external_survey', url: string }} SurveyQuestionContent
+ *
+ * @typedef {Object} SurveyQuestion
+ * @property {SurveyQuestionContent} content
+ * @property {number} id
+ * @property {number} position
+ * @property {boolean} required
+ *
+ * @typedef {Object} Survey
+ * @property {boolean} allows_multiple_responses
+ * @property {boolean} always_visible
+ * @property {string} created_at - ISO 8601
+ * @property {string | null} end_date - ISO 8601
+ * @property {number} id
+ * @property {string} name
+ * @property {SurveyQuestion[]} questions
+ * @property {boolean} show_on_map
+ * @property {boolean} show_on_stops
+ * @property {string | null} start_date - ISO 8601
+ * @property {SurveyStudy} study
+ * @property {string} updated_at - ISO 8601
+ * @property {string[] | null} visible_route_list
+ * @property {string[] | null} visible_stop_list
+ */
+
 export {};

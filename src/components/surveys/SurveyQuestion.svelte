@@ -3,6 +3,7 @@
 	import Checkbox from 'flowbite-svelte/Checkbox.svelte';
 	import Input from 'flowbite-svelte/Input.svelte';
 	import { t } from 'svelte-i18n';
+
 	let {
 		question,
 		required,

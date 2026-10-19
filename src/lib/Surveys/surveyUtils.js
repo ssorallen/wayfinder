@@ -1,6 +1,16 @@
-import { markSurveyAnswered, showSurveyModal, surveyStore } from '$stores/surveyStore.js';
+import { markSurveyAnswered, showSurveyModal, surveyStore } from '$stores/surveyStore';
+import {
+	MOCK_SURVEY_RESPONSE_ID,
+	mockSurvey,
+	shouldMockSurvey
+} from '$components/surveys/mockSurvey.js';
 
 export async function loadSurveys(stop = null, userId = null) {
+	if (shouldMockSurvey()) {
+		surveyStore.set(mockSurvey);
+		if (!stop) showSurveyModal.set(true);
+		return;
+	}
 	try {
 		const response = await fetch(`/api/oba/surveys?userId=${userId}`);
 		if (!response.ok) throw new Error('Failed to fetch surveys');
@@ -113,6 +123,7 @@ export function getMapSurvey(surveys) {
 }
 
 export async function submitHeroQuestion(surveyResponse) {
+	if (shouldMockSurvey()) return MOCK_SURVEY_RESPONSE_ID;
 	try {
 		const payload = {
 			...surveyResponse,
@@ -138,6 +149,7 @@ export async function submitHeroQuestion(surveyResponse) {
 }
 
 export async function updateSurveyResponse(surveyPublicIdentifier, surveyResponse) {
+	if (shouldMockSurvey()) return true;
 	try {
 		const payload = {
 			...surveyResponse,

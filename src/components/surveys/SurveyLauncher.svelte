@@ -1,6 +1,6 @@
 <script>
 	import { onDestroy, tick } from 'svelte';
-	import { showSurveyModal, surveyStore } from '$stores/surveyStore';
+	import { showSurveyModal, surveyStore } from '$src/stores/surveyStore';
 
 	let currentSurvey;
 

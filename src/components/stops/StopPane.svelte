@@ -16,6 +16,10 @@
 	import SurveyBanner from '$components/surveys/SurveyBanner.svelte';
 	import analytics from '$lib/Insights';
 	import { filterActiveAlerts } from '$components/service-alerts/serviceAlertsHelper';
+	import {
+		mockServiceAlerts,
+		shouldMockServiceAlerts
+	} from '$components/service-alerts/mockServiceAlerts';
 	import { removeAgencyPrefix, routeShortNamesForStop } from '$lib/utils';
 	import { makeKey, visibleArrivals } from '$lib/arrivalFiltering';
 	import { fade } from 'svelte/transition';
@@ -27,8 +31,8 @@
 	 *
 	 * @typedef {ArrivalAndDepartureListResponse['data']['entry']['arrivalsAndDepartures'][number]} ArrivalsAndDeparture
 	 * @typedef {string | string[]} SurveyAnswer
-	 * @typedef {{ id: string | number, content: { type: string, label_text: string } }} SurveyQuestion
-	 * @typedef {{ id: string | number, questions: SurveyQuestion[], allows_multiple_responses?: boolean, always_visible?: boolean }} StopSurvey
+	 * @typedef {import('$lib/types').SurveyQuestion} SurveyQuestion
+	 * @typedef {import('$lib/types').Survey} StopSurvey
 	 * @typedef {{ question_id: SurveyQuestion['id'], question_label: string, question_type: string, answer: SurveyAnswer }} SurveyAnswerResponse
 	 *
 	 * @typedef {Object} Props
@@ -161,7 +165,9 @@
 			const data = await response.json();
 			arrivalsAndDeparturesResponse = data;
 			arrivalsAndDepartures = withVisibleArrivals(data.data.entry, Date.now());
-			serviceAlerts = filterActiveAlerts(data.data.references.situations || []);
+			serviceAlerts = filterActiveAlerts(
+				shouldMockServiceAlerts() ? mockServiceAlerts(stop) : data.data.references.situations || []
+			);
 			error = null; // Clear previous errors if successful
 			if (isFirstLoad) {
 				await tick();
@@ -422,11 +428,9 @@
 					</div>
 				{/if}
 
-				{#if serviceAlerts?.length}
-					<div class="mb-4">
-						<ServiceAlerts bind:serviceAlerts stopId={stop.id} routeIds={stop.routeIds ?? []} />
-					</div>
-				{/if}
+				<div class="mb-4">
+					<ServiceAlerts bind:serviceAlerts stopId={stop.id} routeIds={stop.routeIds ?? []} />
+				</div>
 
 				<OnDemandStopCard
 					{stop}

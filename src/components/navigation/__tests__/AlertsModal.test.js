@@ -447,13 +447,13 @@ describe('AlertsModal', () => {
 	});
 
 	test('buttons are keyboard accessible', async () => {
-		render(AlertsModal, {
+		const { baseElement } = render(AlertsModal, {
 			props: {
 				alert: mockAlert
 			}
 		});
 
-		const closeButton = screen.getByRole('button', { name: 'Close' });
+		const closeButton = baseElement.querySelector('[data-dialog-close]');
 		const moreInfoButton = screen.getByRole('button', { name: 'More Info' });
 
 		// Should be able to focus buttons
@@ -462,18 +462,5 @@ describe('AlertsModal', () => {
 
 		moreInfoButton.focus();
 		expect(moreInfoButton).toHaveFocus();
-	});
-
-	test('modal autoclose property is set correctly', () => {
-		const { container } = render(AlertsModal, {
-			props: {
-				alert: mockAlert
-			}
-		});
-
-		// The Modal component should have autoclose enabled
-		// This is a prop passed to the Flowbite Modal component
-		// We can verify the component renders without throwing errors
-		expect(container.firstElementChild).toBeInTheDocument();
 	});
 });
